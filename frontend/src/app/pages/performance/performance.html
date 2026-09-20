@@ -1,0 +1,1225 @@
+<div class="page">
+
+  <!-- ========================================================= -->
+  <!-- PAGE HEADER -->
+  <!-- ========================================================= -->
+
+  <div class="page-header">
+
+    <div>
+      <span class="eyebrow">VENDOR PERFORMANCE</span>
+
+      <h1>Performance Management</h1>
+
+      <p>
+        Monitor supplier delivery, quality, communication and service
+        performance using actual procurement data.
+      </p>
+    </div>
+
+    <button
+      class="refresh-button"
+      type="button"
+      (click)="refresh()"
+    >
+      ↻ Refresh
+    </button>
+
+  </div>
+
+
+  <!-- ========================================================= -->
+  <!-- ERROR -->
+  <!-- ========================================================= -->
+
+  @if (errorMessage) {
+
+    <div class="error-banner">
+
+      <strong>
+        Unable to load performance data
+      </strong>
+
+      <span>
+        {{ errorMessage }}
+      </span>
+
+    </div>
+
+  }
+
+
+  <!-- ========================================================= -->
+  <!-- LOADING -->
+  <!-- ========================================================= -->
+
+  @if (loading) {
+
+    <div class="loading-panel">
+
+      <div class="spinner"></div>
+
+      <p>
+        Loading vendor performance data...
+      </p>
+
+    </div>
+
+  }
+
+
+  <!-- ========================================================= -->
+  <!-- EMPTY -->
+  <!-- ========================================================= -->
+
+  @if (!loading && !errorMessage && summaries.length === 0) {
+
+    <div class="empty-panel">
+
+      <div class="empty-icon">
+        📊
+      </div>
+
+      <h2>
+        No vendor performance data available
+      </h2>
+
+      <p>
+        Vendor performance will appear here after vendors and
+        purchase order performance data are available.
+      </p>
+
+    </div>
+
+  }
+
+
+  <!-- ========================================================= -->
+  <!-- MAIN PERFORMANCE CONTENT -->
+  <!-- ========================================================= -->
+
+  @if (!loading && summaries.length > 0) {
+
+
+    <!-- ======================================================= -->
+    <!-- SELECTED VENDOR -->
+    <!-- ======================================================= -->
+
+    @if (selectedVendor) {
+
+      <section class="selected-vendor panel">
+
+        <div>
+
+          <span class="eyebrow">
+            SELECTED VENDOR
+          </span>
+
+          <h2>
+            {{ selectedVendor.vendor_name }}
+          </h2>
+
+          <p>
+            {{ selectedVendor.category }}
+            ·
+            {{ selectedVendor.vendor_status }}
+          </p>
+
+        </div>
+
+
+        <div class="overall-score">
+
+          <span>
+            Performance Score
+          </span>
+
+          <strong>
+            {{ formatNumber(selectedVendor.performance_score, 0) }}
+          </strong>
+
+          <small
+            [class]="
+              getScoreClass(
+                selectedVendor.performance_score
+              )
+            "
+          >
+            {{ selectedVendor.performance_status }}
+          </small>
+
+        </div>
+
+      </section>
+
+
+      <!-- ===================================================== -->
+      <!-- METRICS -->
+      <!-- ===================================================== -->
+
+      <section class="metric-grid">
+
+
+        <!-- On-Time Deliveries -->
+
+        <div class="metric-card">
+
+          <span>
+            On-Time Deliveries
+          </span>
+
+          <strong>
+            {{ selectedVendor.on_time_deliveries }}
+          </strong>
+
+          <small>
+            {{ selectedVendor.total_orders }}
+            total orders
+          </small>
+
+        </div>
+
+
+        <!-- Delayed Deliveries -->
+
+        <div class="metric-card">
+
+          <span>
+            Delayed Deliveries
+          </span>
+
+          <strong>
+            {{ selectedVendor.delayed_deliveries }}
+          </strong>
+
+          <small>
+            Based on evaluated deliveries
+          </small>
+
+        </div>
+
+
+        <!-- Quality -->
+
+        <div class="metric-card">
+
+          <span>
+            Quality Rating
+          </span>
+
+          <strong>
+            {{ formatNumber(selectedVendor.quality_rating) }}
+            <em>/ 5</em>
+          </strong>
+
+          <small>
+            Product quality
+          </small>
+
+        </div>
+
+
+        <!-- Response -->
+
+        <div class="metric-card">
+
+          <span>
+            Response Time
+          </span>
+
+          <strong>
+            {{ formatNumber(selectedVendor.response_time_hours) }}
+            <em>hrs</em>
+          </strong>
+
+          <small>
+            Average communication response
+          </small>
+
+        </div>
+
+
+        <!-- Issue Resolution -->
+
+        <div class="metric-card">
+
+          <span>
+            Issue Resolution Time
+          </span>
+
+          <strong>
+            {{ formatNumber(selectedVendor.issue_resolution_time_hours) }}
+            <em>hrs</em>
+          </strong>
+
+          <small>
+            Average issue resolution
+          </small>
+
+        </div>
+
+
+        <!-- Completion -->
+
+        <div class="metric-card">
+
+          <span>
+            Order Completion Rate
+          </span>
+
+          <strong>
+            {{ formatNumber(selectedVendor.order_completion_rate, 0) }}%
+          </strong>
+
+          <small>
+            Completed orders
+          </small>
+
+        </div>
+
+      </section>
+
+
+      <!-- ===================================================== -->
+      <!-- HISTORY + RANKING -->
+      <!-- ===================================================== -->
+
+      <section class="content-grid">
+
+
+        <!-- =================================================== -->
+        <!-- PERFORMANCE HISTORY -->
+        <!-- =================================================== -->
+
+        <div class="panel history-panel">
+
+          <div class="panel-header">
+
+            <div>
+
+              <h2>
+                Performance History
+              </h2>
+
+              <p>
+                Delivery and evaluation history for
+                {{ selectedVendor.vendor_name }}.
+              </p>
+
+            </div>
+
+            <span class="history-count">
+              {{ history.length }}
+              Evaluations
+            </span>
+
+          </div>
+
+
+          <!-- History Loading -->
+
+          @if (historyLoading) {
+
+            <div class="table-loading">
+
+              Loading performance history...
+
+            </div>
+
+          }
+
+
+          <!-- History Error -->
+
+          @if (historyErrorMessage) {
+
+            <div class="table-empty">
+
+              <strong>
+                Unable to load history
+              </strong>
+
+              <p>
+                {{ historyErrorMessage }}
+              </p>
+
+            </div>
+
+          }
+
+
+          <!-- No History -->
+
+          @if (
+            !historyLoading &&
+            !historyErrorMessage &&
+            history.length === 0
+          ) {
+
+            <div class="table-empty">
+
+              <strong>
+                No performance history
+              </strong>
+
+              <p>
+                No completed performance evaluations are
+                available for this vendor yet.
+              </p>
+
+            </div>
+
+          }
+
+
+          <!-- History Table -->
+
+          @if (
+            !historyLoading &&
+            !historyErrorMessage &&
+            history.length > 0
+          ) {
+
+            <div class="table-wrapper">
+
+              <table>
+
+                <thead>
+
+                  <tr>
+
+                    <th>
+                      PO
+                    </th>
+
+                    <th>
+                      Expected Delivery
+                    </th>
+
+                    <th>
+                      Actual Delivery
+                    </th>
+
+                    <th>
+                      Status
+                    </th>
+
+                    <th>
+                      Quality
+                    </th>
+
+                    <th>
+                      Service
+                    </th>
+
+                    <th>
+                      Evaluation Date
+                    </th>
+
+                  </tr>
+
+                </thead>
+
+
+                <tbody>
+
+                  @for (
+                    item of history;
+                    track item.id
+                  ) {
+
+                    <tr>
+
+                      <td>
+                        {{ item.purchase_order_number || '—' }}
+                      </td>
+
+                      <td>
+                        {{ formatDate(item.expected_delivery_date) }}
+                      </td>
+
+                      <td>
+                        {{ formatDate(item.actual_delivery_date) }}
+                      </td>
+
+                      <td>
+
+                        <span
+                          class="status-badge"
+                          [class]="
+                            getDeliveryClass(
+                              item.delivery_status
+                            )
+                          "
+                        >
+                          {{ item.delivery_status }}
+                        </span>
+
+                      </td>
+
+                      <td>
+                        {{ formatNumber(item.quality_rating) }}
+                      </td>
+
+                      <td>
+                        {{ formatNumber(item.service_rating) }}
+                      </td>
+
+                      <td>
+                        {{ formatDate(item.evaluation_date) }}
+                      </td>
+
+                    </tr>
+
+                  }
+
+                </tbody>
+
+              </table>
+
+            </div>
+
+          }
+
+        </div>
+
+
+        <!-- =================================================== -->
+        <!-- VENDOR RANKING -->
+        <!-- =================================================== -->
+
+        <div class="panel ranking-panel">
+
+          <div class="panel-header">
+
+            <div>
+
+              <h2>
+                Vendor Ranking
+              </h2>
+
+              <p>
+                Vendors ranked by calculated performance score.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div class="ranking-list">
+
+            @for (
+              vendor of summaries;
+              track vendor.vendor_id
+            ) {
+
+              <button
+                type="button"
+                class="ranking-row"
+                [class.selected]="
+                  selectedVendor?.vendor_id === vendor.vendor_id
+                "
+                (click)="selectVendor(vendor)"
+              >
+
+                <span class="rank">
+                  #{{ vendor.ranking || '—' }}
+                </span>
+
+
+                <span class="ranking-info">
+
+                  <strong>
+                    {{ vendor.vendor_name }}
+                  </strong>
+
+                  <small>
+                    {{ vendor.performance_status }}
+                  </small>
+
+                </span>
+
+
+                <span
+                  class="ranking-score"
+                  [class]="
+                    getScoreClass(
+                      vendor.performance_score
+                    )
+                  "
+                >
+                  {{
+                    formatNumber(
+                      vendor.performance_score,
+                      0
+                    )
+                  }}
+                </span>
+
+              </button>
+
+            }
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- ===================================================== -->
+      <!-- SERVICE RATING -->
+      <!-- ===================================================== -->
+
+      <section class="panel service-panel">
+
+        <div class="panel-header">
+
+          <div>
+
+            <h2>
+              Service Rating
+            </h2>
+
+            <p>
+              Key quality, service and communication indicators.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="rating-grid">
+
+
+          <!-- Overall Service -->
+
+          <div class="rating-item">
+
+            <div class="rating-label">
+
+              <span>
+                Overall Service Rating
+              </span>
+
+              <strong>
+                {{
+                  formatNumber(
+                    selectedVendor.service_rating
+                  )
+                }}
+                / 5
+              </strong>
+
+            </div>
+
+
+            <div class="progress-track">
+
+              <div
+                class="progress-bar"
+                [style.width.%]="
+                  selectedVendor.service_rating !== null &&
+                  selectedVendor.service_rating !== undefined
+                    ? selectedVendor.service_rating * 20
+                    : 0
+                "
+              ></div>
+
+            </div>
+
+          </div>
+
+
+          <!-- Product Quality -->
+
+          <div class="rating-item">
+
+            <div class="rating-label">
+
+              <span>
+                Product Quality
+              </span>
+
+              <strong>
+                {{
+                  formatNumber(
+                    selectedVendor.quality_rating
+                  )
+                }}
+                / 5
+              </strong>
+
+            </div>
+
+
+            <div class="progress-track">
+
+              <div
+                class="progress-bar"
+                [style.width.%]="
+                  selectedVendor.quality_rating !== null &&
+                  selectedVendor.quality_rating !== undefined
+                    ? selectedVendor.quality_rating * 20
+                    : 0
+                "
+              ></div>
+
+            </div>
+
+          </div>
+
+
+          <!-- Communication -->
+
+          <div class="rating-item">
+
+            <div class="rating-label">
+
+              <span>
+                Communication Response
+              </span>
+
+              <strong>
+                {{
+                  formatNumber(
+                    selectedVendor.response_time_hours
+                  )
+                }}
+                hrs
+              </strong>
+
+            </div>
+
+
+            <div class="response-box">
+
+              Average response time:
+
+              <strong>
+                {{
+                  formatNumber(
+                    selectedVendor.response_time_hours
+                  )
+                }}
+                hours
+              </strong>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+    }
+
+
+    <!-- ======================================================= -->
+    <!-- VENDOR LIST -->
+    <!-- ======================================================= -->
+
+    <section class="vendor-selector panel">
+
+      <div class="section-heading">
+
+        <div>
+
+          <h2>
+            Vendor Performance
+          </h2>
+
+          <p>
+            Select a vendor to view detailed performance history.
+          </p>
+
+        </div>
+
+
+        <span class="vendor-count">
+
+          {{ summaries.length }}
+
+          Vendors
+
+        </span>
+
+      </div>
+
+
+      <div class="vendor-list">
+
+        @for (
+          vendor of summaries;
+          track vendor.vendor_id
+        ) {
+
+          <button
+            type="button"
+            class="vendor-option"
+            [class.active]="
+              selectedVendor?.vendor_id === vendor.vendor_id
+            "
+            (click)="selectVendor(vendor)"
+          >
+
+            <div class="vendor-option-main">
+
+              <strong>
+                {{ vendor.vendor_name }}
+              </strong>
+
+              <span>
+                {{ vendor.category }}
+              </span>
+
+            </div>
+
+
+            <div
+              class="score-badge"
+              [class]="
+                getScoreClass(
+                  vendor.performance_score
+                )
+              "
+            >
+
+              {{
+                formatNumber(
+                  vendor.performance_score,
+                  0
+                )
+              }}
+
+            </div>
+
+          </button>
+
+        }
+
+      </div>
+
+    </section>
+
+  }
+
+</div>
+
+
+<!-- =========================================================== -->
+<!-- SUPPLY CHAIN BENCHMARK -->
+<!-- =========================================================== -->
+
+<section class="dataset-benchmark panel">
+
+  <div class="panel-header">
+
+    <div>
+
+      <div class="benchmark-title">
+
+        <h2>
+          Supply Chain Benchmark
+        </h2>
+
+        <span class="benchmark-badge">
+          REAL DATA
+        </span>
+
+      </div>
+
+      <p>
+        Dataset-wide delivery benchmark calculated from
+        the DataCo supply-chain records.
+      </p>
+
+    </div>
+
+
+    @if (!datasetLoading && datasetAnalytics) {
+
+      <span class="history-count">
+
+        {{ integer(datasetAnalytics.total_records) }}
+
+        Records
+
+      </span>
+
+    }
+
+  </div>
+
+
+  <!-- Dataset Loading -->
+
+  @if (datasetLoading) {
+
+    <div class="dataset-loading">
+
+      <div class="spinner"></div>
+
+      <p>
+        Loading supply-chain benchmark...
+      </p>
+
+    </div>
+
+  }
+
+
+  <!-- Dataset Error -->
+
+  @if (datasetErrorMessage) {
+
+    <div class="dataset-error">
+
+      {{ datasetErrorMessage }}
+
+    </div>
+
+  }
+
+
+  <!-- Dataset Data -->
+
+  @if (!datasetLoading && datasetAnalytics) {
+
+
+    <!-- ======================================================= -->
+    <!-- BENCHMARK METRICS -->
+    <!-- ======================================================= -->
+
+    <div class="benchmark-grid">
+
+
+      <div class="benchmark-card">
+
+        <span>
+          Dataset Records
+        </span>
+
+        <strong>
+          {{
+            integer(
+              datasetAnalytics.total_records
+            )
+          }}
+        </strong>
+
+        <small>
+          {{ datasetAnalytics.dataset_name }}
+        </small>
+
+      </div>
+
+
+      <div class="benchmark-card">
+
+        <span>
+          On-Time Delivery Rate
+        </span>
+
+        <strong>
+          {{
+            percentage(
+              datasetAnalytics.on_time_delivery_rate
+            )
+          }}
+        </strong>
+
+        <small>
+          Dataset benchmark
+        </small>
+
+      </div>
+
+
+      <div class="benchmark-card">
+
+        <span>
+          Late Delivery Rate
+        </span>
+
+        <strong>
+          {{
+            percentage(
+              datasetAnalytics.late_delivery_rate
+            )
+          }}
+        </strong>
+
+        <small>
+          {{
+            integer(
+              datasetAnalytics.late_delivery_count
+            )
+          }}
+          late records
+        </small>
+
+      </div>
+
+
+      <div class="benchmark-card">
+
+        <span>
+          Average Shipping Delay
+        </span>
+
+        <strong>
+          {{
+            days(
+              datasetAnalytics.average_shipping_delay_days
+            )
+          }}
+        </strong>
+
+        <small>
+          Actual minus scheduled
+        </small>
+
+      </div>
+
+
+      <div class="benchmark-card">
+
+        <span>
+          Actual Shipping Time
+        </span>
+
+        <strong>
+          {{
+            days(
+              datasetAnalytics.average_actual_shipping_days
+            )
+          }}
+        </strong>
+
+        <small>
+          Average actual
+        </small>
+
+      </div>
+
+
+      <div class="benchmark-card">
+
+        <span>
+          Scheduled Shipping Time
+        </span>
+
+        <strong>
+          {{
+            days(
+              datasetAnalytics.average_scheduled_shipping_days
+            )
+          }}
+        </strong>
+
+        <small>
+          Average scheduled
+        </small>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================================= -->
+    <!-- DELIVERY OUTCOME -->
+    <!-- ======================================================= -->
+
+    <div class="benchmark-panel">
+
+      <h3>
+        Delivery Outcome Benchmark
+      </h3>
+
+      <p>
+        Distribution of delivery outcomes across the
+        complete supply-chain dataset.
+      </p>
+
+
+      <div class="benchmark-status-grid">
+
+
+        <!-- Late -->
+
+        <div class="benchmark-status">
+
+          <div class="benchmark-status-header">
+
+            <span>
+              Late Delivery
+            </span>
+
+            <strong>
+              {{
+                integer(
+                  datasetAnalytics.delivery_status.late_delivery
+                )
+              }}
+            </strong>
+
+          </div>
+
+
+          <div class="progress-track">
+
+            <div
+              class="progress-bar benchmark-late"
+              [style.width.%]="
+                datasetProgress(
+                  datasetAnalytics.delivery_status.late_delivery
+                )
+              "
+            ></div>
+
+          </div>
+
+        </div>
+
+
+        <!-- Advance -->
+
+        <div class="benchmark-status">
+
+          <div class="benchmark-status-header">
+
+            <span>
+              Advance Shipping
+            </span>
+
+            <strong>
+              {{
+                integer(
+                  datasetAnalytics.delivery_status.advance_shipping
+                )
+              }}
+            </strong>
+
+          </div>
+
+
+          <div class="progress-track">
+
+            <div
+              class="progress-bar"
+              [style.width.%]="
+                datasetProgress(
+                  datasetAnalytics.delivery_status.advance_shipping
+                )
+              "
+            ></div>
+
+          </div>
+
+        </div>
+
+
+        <!-- On Time -->
+
+        <div class="benchmark-status">
+
+          <div class="benchmark-status-header">
+
+            <span>
+              Shipping On Time
+            </span>
+
+            <strong>
+              {{
+                integer(
+                  datasetAnalytics.delivery_status.shipping_on_time
+                )
+              }}
+            </strong>
+
+          </div>
+
+
+          <div class="progress-track">
+
+            <div
+              class="progress-bar"
+              [style.width.%]="
+                datasetProgress(
+                  datasetAnalytics.delivery_status.shipping_on_time
+                )
+              "
+            ></div>
+
+          </div>
+
+        </div>
+
+
+        <!-- Cancelled -->
+
+        <div class="benchmark-status">
+
+          <div class="benchmark-status-header">
+
+            <span>
+              Shipping Canceled
+            </span>
+
+            <strong>
+              {{
+                integer(
+                  datasetAnalytics.delivery_status.shipping_canceled
+                )
+              }}
+            </strong>
+
+          </div>
+
+
+          <div class="progress-track">
+
+            <div
+              class="progress-bar"
+              [style.width.%]="
+                datasetProgress(
+                  datasetAnalytics.delivery_status.shipping_canceled
+                )
+              "
+            ></div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- ======================================================= -->
+    <!-- BENCHMARK NOTE -->
+    <!-- ======================================================= -->
+
+    <div class="benchmark-note">
+
+      <strong>
+        Benchmark source
+      </strong>
+
+      <span>
+        This benchmark represents the overall supply-chain
+        dataset and is not assigned to individual VendorIQ
+        vendors because the dataset does not contain VendorIQ
+        vendor identifiers.
+      </span>
+
+    </div>
+
+  }
+
+</section>

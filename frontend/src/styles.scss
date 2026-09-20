@@ -1,0 +1,644 @@
+@use '@angular/material' as mat;
+
+/* =========================================================
+   VENDORIQ GLOBAL DARK BLUE THEME
+   ========================================================= */
+
+html {
+  height: 100%;
+
+  @include mat.theme((
+    color: (
+      primary: mat.$azure-palette,
+      tertiary: mat.$blue-palette,
+    ),
+    typography: Roboto,
+    density: 0,
+  ));
+}
+
+html,
+body {
+  min-height: 100%;
+  margin: 0;
+  background: #070f1d !important;
+  color: #e8eef7 !important;
+  font-family: Inter, Roboto, "Segoe UI", Arial, Helvetica, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+input,
+select,
+textarea {
+  font: inherit;
+}
+
+/* =========================================================
+   GLOBAL APPLICATION BACKGROUND
+   ========================================================= */
+
+body,
+app-root,
+router-outlet {
+  background: #070f1d !important;
+}
+
+.app-shell {
+  background: #070f1d !important;
+  color: #e8eef7 !important;
+}
+
+.main-content,
+.content,
+.page-content {
+  background: #070f1d !important;
+  color: #e8eef7 !important;
+}
+
+/* =========================================================
+   PAGE HEADERS
+   ========================================================= */
+
+.page-header,
+.page-header h1,
+.page-header h2,
+.page-header h3 {
+  color: #f8fafc !important;
+}
+
+.page-header p {
+  color: #8fa6c3 !important;
+}
+
+.eyebrow {
+  color: #4f8cff !important;
+  opacity: 1 !important;
+}
+
+/* =========================================================
+   ALL COMMON WHITE CONTAINERS → DARK BLUE
+   ========================================================= */
+
+.summary-card,
+.notification-panel,
+.notification-item,
+.report-panel,
+.metric-card,
+.system-card,
+.panel,
+.panel-header,
+.panel-title,
+.card,
+.dashboard-card,
+.stat-card,
+.info-card,
+.data-card,
+.table-card,
+.form-card,
+.filter-card,
+.vendor-card,
+.performance-card,
+.reliability-card,
+.contract-card,
+.communication-card,
+.procurement-card,
+.purchase-order-card,
+.user-card,
+.loading-card,
+.empty-state,
+.error-message {
+  background: #0b1729 !important;
+  color: #e8eef7 !important;
+  border-color: #1b3556 !important;
+}
+
+/* =========================================================
+   COMMON SECONDARY LIGHT BACKGROUNDS
+   ========================================================= */
+
+.summary-icon,
+.notification-icon,
+.type-badge,
+.channel-badge,
+.read-status,
+.system-icon,
+.metric-card,
+.badge,
+.compliance-badge {
+  background: #11233b !important;
+  color: #b9c9df !important;
+}
+
+/* =========================================================
+   TABLES
+   ========================================================= */
+
+table {
+  background: #0b1729 !important;
+  color: #dce8f7 !important;
+  border-color: #1b3556 !important;
+}
+
+thead,
+th {
+  background: #0e2037 !important;
+  color: #8faed0 !important;
+  border-color: #1b3556 !important;
+}
+
+tbody,
+tr,
+td {
+  background: #0b1729 !important;
+  color: #dce8f7 !important;
+  border-color: #1b3556 !important;
+}
+
+tbody tr:hover,
+.notification-item:hover {
+  background: #10233b !important;
+}
+
+/* =========================================================
+   TEXT INSIDE DARK CARDS
+   ========================================================= */
+
+.summary-card strong,
+.metric-card strong,
+.panel-title h2,
+.panel-header h2,
+.notification-top h3,
+.system-card h3,
+.strong,
+.score,
+.amount {
+  color: #f1f6ff !important;
+}
+
+.summary-card span,
+.metric-card span,
+.panel-title p,
+.panel-header p,
+.system-card p,
+.notification-content p {
+  color: #91a8c4 !important;
+}
+
+/* =========================================================
+   FORMS / INPUTS / SELECTS
+   ========================================================= */
+
+input,
+select,
+textarea {
+  background: #0b1729 !important;
+  color: #e8eef7 !important;
+  border: 1px solid #29476d !important;
+}
+
+input::placeholder,
+textarea::placeholder {
+  color: #7187a3 !important;
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+  background: #0d1c31 !important;
+  color: #ffffff !important;
+  border-color: #4f8cff !important;
+  outline: none;
+}
+
+option {
+  background: #0b1729 !important;
+  color: #e8eef7 !important;
+}
+
+/* =========================================================
+   FILTER AREAS
+   ========================================================= */
+
+.filters,
+.report-tabs,
+.vendor-filters,
+.filter-section,
+.filters-section,
+.search-section {
+  color: #e8eef7 !important;
+}
+
+.filters button,
+.report-tabs button {
+  background: #0d1c31 !important;
+  color: #dbe8f8 !important;
+  border-color: #29476d !important;
+}
+
+.filters button:hover,
+.report-tabs button:hover {
+  background: #142b49 !important;
+  color: #ffffff !important;
+}
+
+.filters button.active,
+.report-tabs button.active {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #2563eb !important;
+}
+
+/* =========================================================
+   BUTTONS
+   ========================================================= */
+
+.secondary-button {
+  background: #10233b !important;
+  color: #e8eef7 !important;
+  border-color: #29476d !important;
+}
+
+.secondary-button:hover {
+  background: #163152 !important;
+  color: #ffffff !important;
+}
+
+.primary-button {
+  background: #2563eb !important;
+  color: #ffffff !important;
+  border-color: #2563eb !important;
+}
+
+.primary-button:hover {
+  background: #3578f4 !important;
+}
+
+/* =========================================================
+   NOTIFICATIONS
+   ========================================================= */
+
+.notification-item {
+  background: #0b1729 !important;
+}
+
+.notification-item.unread {
+  background: #0e2037 !important;
+}
+
+.notification-time {
+  color: #7189a8 !important;
+}
+
+.type-badge {
+  background: #142943 !important;
+  color: #bcd0e8 !important;
+}
+
+.channel-badge {
+  background: #10233b !important;
+  color: #9db2cc !important;
+}
+
+.read-status {
+  background: #182b43 !important;
+  color: #9db2cc !important;
+}
+
+/* =========================================================
+   VENDOR / PROCUREMENT / PURCHASE ORDER SECTIONS
+   ========================================================= */
+
+.vendor-directory,
+.vendor-list,
+.procurement-list,
+.purchase-order-list,
+.order-list,
+.contract-list,
+.communication-list,
+.performance-list,
+.reliability-list,
+.user-list {
+  background: #0b1729 !important;
+  color: #e8eef7 !important;
+  border-color: #1b3556 !important;
+}
+
+/* =========================================================
+   REPORTS
+   ========================================================= */
+
+.report-panel {
+  background: #0b1729 !important;
+}
+
+.panel-title {
+  background: #0b1729 !important;
+}
+
+.panel-title h2 {
+  color: #f1f6ff !important;
+}
+
+.panel-title p {
+  color: #91a8c4 !important;
+}
+
+.metric-grid {
+  background: #0b1729 !important;
+}
+
+.metric-card {
+  background: #102039 !important;
+}
+
+/* =========================================================
+   ANALYTICS
+   ========================================================= */
+
+.analytics-page,
+.analytics-card,
+.analytics-panel,
+.analytics-section,
+.chart-card,
+.chart-container {
+  background: #0b1729 !important;
+  color: #e8eef7 !important;
+  border-color: #1b3556 !important;
+}
+
+/* =========================================================
+   PERFORMANCE
+   ========================================================= */
+
+.performance-page,
+.performance-card,
+.performance-panel,
+.performance-history,
+.performance-table,
+.ranking-card,
+.vendor-ranking {
+  background: #0b1729 !important;
+  color: #e8eef7 !important;
+  border-color: #1b3556 !important;
+}
+
+/* =========================================================
+   RELIABILITY
+   ========================================================= */
+
+.reliability-page,
+.reliability-card,
+.reliability-panel,
+.reliability-table,
+.reliability-factor {
+  background: #0b1729 !important;
+  color: #e8eef7 !important;
+  border-color: #1b3556 !important;
+}
+
+/* =========================================================
+   USERS
+   ========================================================= */
+
+.users-page,
+.users-panel,
+.users-table,
+.user-directory,
+.user-summary,
+.user-card {
+  background: #0b1729 !important;
+  color: #e8eef7 !important;
+  border-color: #1b3556 !important;
+}
+
+.users-page table,
+.users-page tbody,
+.users-page tr,
+.users-page td {
+  background: #0b1729 !important;
+  color: #dce8f7 !important;
+}
+
+/* =========================================================
+   CONTRACTS
+   ========================================================= */
+
+.contracts-page,
+.contracts-panel,
+.contract-card,
+.contract-table,
+.contract-summary {
+  background: #0b1729 !important;
+  color: #e8eef7 !important;
+  border-color: #1b3556 !important;
+}
+
+/* =========================================================
+   COMMUNICATION
+   ========================================================= */
+
+.communication-page,
+.communication-panel,
+.message-card,
+.message-list,
+.communication-card {
+  background: #0b1729 !important;
+  color: #e8eef7 !important;
+  border-color: #1b3556 !important;
+}
+
+/* =========================================================
+   VENDOR MANAGEMENT
+   ========================================================= */
+
+.vendors-page,
+.vendor-panel,
+.vendor-directory,
+.vendor-card,
+.vendor-table,
+.vendor-summary,
+.vendor-filters {
+  background: #0b1729 !important;
+  color: #e8eef7 !important;
+  border-color: #1b3556 !important;
+}
+
+.vendors-page table,
+.vendors-page tbody,
+.vendors-page tr,
+.vendors-page td {
+  background: #0b1729 !important;
+  color: #dce8f7 !important;
+}
+
+/* =========================================================
+   PROCUREMENT
+   ========================================================= */
+
+.procurement-page,
+.procurement-panel,
+.procurement-card,
+.procurement-table,
+.procurement-summary {
+  background: #0b1729 !important;
+  color: #e8eef7 !important;
+  border-color: #1b3556 !important;
+}
+
+/* =========================================================
+   PURCHASE ORDERS
+   ========================================================= */
+
+.purchase-orders-page,
+.purchase-order-panel,
+.purchase-order-card,
+.purchase-order-table,
+.purchase-order-summary {
+  background: #0b1729 !important;
+  color: #e8eef7 !important;
+  border-color: #1b3556 !important;
+}
+
+/* =========================================================
+   STATUS BADGES
+   Keep meaningful status colors
+   ========================================================= */
+
+.status-approved,
+.approved,
+.badge-approved {
+  background: rgba(16, 185, 129, 0.15) !important;
+  color: #34d399 !important;
+}
+
+.status-pending,
+.pending,
+.badge-pending {
+  background: rgba(245, 158, 11, 0.15) !important;
+  color: #fbbf24 !important;
+}
+
+.status-rejected,
+.rejected,
+.badge-rejected {
+  background: rgba(239, 68, 68, 0.15) !important;
+  color: #f87171 !important;
+}
+
+.status-completed,
+.completed {
+  background: rgba(34, 197, 94, 0.15) !important;
+  color: #4ade80 !important;
+}
+
+/* =========================================================
+   EMPTY / ERROR / LOADING
+   ========================================================= */
+
+.empty,
+.empty-state {
+  color: #8fa6c3 !important;
+}
+
+.loading-card {
+  background: #0b1729 !important;
+  color: #8fa6c3 !important;
+}
+
+.error-message {
+  background: #1a2435 !important;
+  color: #c8d6e8 !important;
+  border-color: #344b69 !important;
+}
+
+/* =========================================================
+   SPINNER
+   ========================================================= */
+
+.spinner {
+  border-color: #243b5a !important;
+  border-top-color: #4f8cff !important;
+}
+
+/* =========================================================
+   LOGIN / REGISTER / PASSWORD PAGES
+   ========================================================= */
+
+.login-page,
+.register-page,
+.forgot-password-page,
+.reset-password-page {
+  background: #070f1d !important;
+  color: #e8eef7 !important;
+}
+
+.login-card,
+.register-card,
+.auth-card,
+.reset-card,
+.forgot-card {
+  background: #0b1729 !important;
+  color: #e8eef7 !important;
+  border-color: #1b3556 !important;
+}
+
+/* =========================================================
+   ANGULAR MATERIAL SURFACES
+   ========================================================= */
+
+.mat-mdc-card,
+.mat-mdc-menu-panel,
+.mat-mdc-dialog-container,
+.mat-mdc-select-panel,
+.mat-mdc-option {
+  background: #0b1729 !important;
+  color: #e8eef7 !important;
+}
+
+.mat-mdc-menu-item,
+.mat-mdc-option {
+  color: #e8eef7 !important;
+}
+
+.mat-mdc-menu-item:hover,
+.mat-mdc-option:hover {
+  background: #142943 !important;
+}
+
+/* =========================================================
+   LINKS
+   ========================================================= */
+
+a {
+  color: #63a4ff;
+}
+
+a:hover {
+  color: #8bbcff;
+}
+
+/* =========================================================
+   SCROLLBAR
+   ========================================================= */
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #070f1d;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1c3555;
+  border-radius: 8px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #2b4f7c;
+}
