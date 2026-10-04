@@ -1,3 +1,4 @@
+
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
@@ -31,6 +32,74 @@ MANAGEMENT_ROLES = (
     UserRole.PROCUREMENT_MANAGER,
     UserRole.SUPPLY_CHAIN_MANAGER,
 )
+
+
+def _role_value(user) -> str:
+    role = user.role
+    return role.value if hasattr(role, "value") else str(role)
+
+
+def _allowed_next_statuses(user, current_status: str) -> set[str]:
+    """Return workflow transitions permitted for the signed-in role."""
+    role = _role_value(user)
+
+    if role == UserRole.ADMINISTRATOR.value:
+        # Administrators can correct records when resolving exceptional cases.
+        return set(PROCUREMENT_STATUSES) - {current_status}
+
+    if role == UserRole.PROCUREMENT_MANAGER.value:
+        transitions = {
+            "Pending": {"Cancelled"},
+            "Approved": {"Ordered", "Cancelled"},
+            "Ordered": {"Delivered", "Cancelled"},
+        }
+        return transitions.get(current_status, set())
+
+    if role == UserRole.SUPPLY_CHAIN_MANAGER.value:
+        transitions = {
+            "Pending": {"Approved", "Rejected"},
+            "Ordered": {"Delivered"},
+            "Delivered": {"Completed"},
+        }
+        return transitions.get(current_status, set())
+
+    return set()
+
+
+# =========================================================
+# APPROVED VENDOR VALIDATION
+# =========================================================
+
+def _get_approved_vendor(
+    db: Session,
+    vendor_id: int,
+) -> Vendor:
+    """
+    Retrieve a vendor and ensure that only an approved vendor
+    can be assigned to a procurement request.
+    """
+    vendor = (
+        db.query(Vendor)
+        .filter(Vendor.id == vendor_id)
+        .first()
+    )
+
+    if not vendor:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Vendor not found",
+        )
+
+    if vendor.status != "Approved":
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail=(
+                "Only approved vendors can be assigned "
+                "to procurement requests."
+            ),
+        )
+
+    return vendor
 
 
 # =========================================================
@@ -78,7 +147,10 @@ def create_procurement_request(
     request: ProcurementCreate,
     db: Session = Depends(get_db),
     current_user=Depends(
-        require_roles(*MANAGEMENT_ROLES)
+        require_roles(
+            UserRole.ADMINISTRATOR,
+            UserRole.PROCUREMENT_MANAGER,
+        )
     ),
 ):
     if request.priority not in PROCUREMENT_PRIORITIES:
@@ -87,19 +159,13 @@ def create_procurement_request(
             detail="Invalid procurement priority",
         )
 
+    # A request may initially have no vendor assigned.
+    # If a vendor is assigned, it must already be approved.
     if request.vendor_id is not None:
-
-        vendor = (
-            db.query(Vendor)
-            .filter(Vendor.id == request.vendor_id)
-            .first()
+        _get_approved_vendor(
+            db=db,
+            vendor_id=request.vendor_id,
         )
-
-        if not vendor:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="Vendor not found",
-            )
 
     new_request = ProcurementRequest(
         title=request.title,
@@ -112,9 +178,13 @@ def create_procurement_request(
         created_by=current_user.id,
     )
 
-    db.add(new_request)
-    db.commit()
-    db.refresh(new_request)
+    try:
+        db.add(new_request)
+        db.commit()
+        db.refresh(new_request)
+    except Exception:
+        db.rollback()
+        raise
 
     return new_request
 
@@ -137,7 +207,6 @@ def get_procurement_requests(
     query = db.query(ProcurementRequest)
 
     if request_status:
-
         if request_status not in PROCUREMENT_STATUSES:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
@@ -217,41 +286,63 @@ def update_procurement_request(
             detail="Procurement request not found",
         )
 
+    role = _role_value(current_user)
+
+    if (
+        role == UserRole.PROCUREMENT_MANAGER.value
+        and request.status != "Pending"
+    ):
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=(
+                "Only pending procurement requests can be "
+                "edited by a Procurement Manager."
+            ),
+        )
+
+    if role not in {
+        UserRole.ADMINISTRATOR.value,
+        UserRole.PROCUREMENT_MANAGER.value,
+    }:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail=(
+                "Only an Administrator or Procurement Manager "
+                "can edit request details."
+            ),
+        )
+
     updates = request_data.model_dump(
         exclude_unset=True
     )
 
     if "priority" in updates:
-
         if updates["priority"] not in PROCUREMENT_PRIORITIES:
             raise HTTPException(
                 status_code=status.HTTP_400_BAD_REQUEST,
                 detail="Invalid procurement priority",
             )
 
+    # Validate a newly assigned vendor.
+    # If vendor_id is explicitly set to null, the assignment is cleared.
     if "vendor_id" in updates:
-
         vendor_id = updates["vendor_id"]
 
         if vendor_id is not None:
-
-            vendor = (
-                db.query(Vendor)
-                .filter(Vendor.id == vendor_id)
-                .first()
+            _get_approved_vendor(
+                db=db,
+                vendor_id=vendor_id,
             )
-
-            if not vendor:
-                raise HTTPException(
-                    status_code=status.HTTP_404_NOT_FOUND,
-                    detail="Vendor not found",
-                )
 
     for field, value in updates.items():
         setattr(request, field, value)
 
-    db.commit()
-    db.refresh(request)
+    try:
+        db.commit()
+        db.refresh(request)
+    except Exception:
+        db.rollback()
+        raise
 
     return request
 
@@ -292,10 +383,37 @@ def update_procurement_status(
             detail="Procurement request not found",
         )
 
+    # Recheck the vendor if the request is being approved.
+    if status_data.status == "Approved":
+        if request.vendor_id is not None:
+            _get_approved_vendor(
+                db=db,
+                vendor_id=request.vendor_id,
+            )
+
+    allowed_next = _allowed_next_statuses(
+        current_user,
+        request.status,
+    )
+
+    if status_data.status not in allowed_next:
+        raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=(
+                f"Transition from '{request.status}' "
+                f"to '{status_data.status}' "
+                f"is not permitted for {_role_value(current_user)}."
+            ),
+        )
+
     request.status = status_data.status
 
-    db.commit()
-    db.refresh(request)
+    try:
+        db.commit()
+        db.refresh(request)
+    except Exception:
+        db.rollback()
+        raise
 
     return request
 
@@ -330,6 +448,11 @@ def delete_procurement_request(
         )
 
     db.delete(request)
-    db.commit()
+
+    try:
+        db.commit()
+    except Exception:
+        db.rollback()
+        raise
 
     return None

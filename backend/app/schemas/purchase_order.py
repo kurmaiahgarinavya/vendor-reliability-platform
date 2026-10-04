@@ -1,3 +1,4 @@
+
 from datetime import date, datetime
 from decimal import Decimal
 
@@ -86,6 +87,14 @@ class PurchaseOrderStatusUpdate(BaseModel):
     status: str
 
 
+class DeliveryUpdate(BaseModel):
+    actual_delivery_date: date
+    delivery_notes: str | None = Field(
+        default=None,
+        max_length=2000
+    )
+
+
 class PurchaseOrderItemResponse(BaseModel):
     id: int
     purchase_order_id: int
@@ -104,6 +113,8 @@ class PurchaseOrderResponse(BaseModel):
     po_number: str
     order_date: date
     expected_delivery_date: date
+    actual_delivery_date: date | None
+    delivery_notes: str | None
     procurement_request_id: int | None
     department: str
     vendor_id: int

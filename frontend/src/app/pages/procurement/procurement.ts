@@ -1,5 +1,9 @@
+
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../../core/services/auth';
 import { Component, OnInit } from '@angular/core';
+import { BaseChartDirective } from 'ng2-charts';
+import { ChartData, ChartOptions } from 'chart.js';
 import {
   FormsModule,
   NgForm
@@ -28,7 +32,8 @@ import {
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    BaseChartDirective
   ],
   templateUrl: './procurement.html',
   styleUrl: './procurement.scss'
@@ -54,6 +59,145 @@ export class Procurement implements OnInit {
 
   filterStatus = '';
 
+  // Chart options
+  readonly pieChartOptions: ChartOptions<'pie'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom'
+      }
+    }
+  };
+
+  readonly doughnutChartOptions: ChartOptions<'doughnut'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        position: 'bottom'
+      }
+    }
+  };
+
+  readonly barChartOptions: ChartOptions<'bar'> = {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
+      legend: {
+        display: false
+      }
+    },
+    scales: {
+      y: {
+        beginAtZero: true,
+        ticks: {
+          precision: 0
+        }
+      }
+    }
+  };
+
+  // Procurement request status pie chart
+  get requestStatusChartData(): ChartData<'pie', number[], string> {
+    const labels = [...this.statuses];
+
+    return {
+      labels,
+      datasets: [{
+        data: labels.map(status =>
+          this.requests.filter(request => request.status === status).length
+        ),
+        backgroundColor: [
+          '#f59e0b',
+          '#16a34a',
+          '#ef4444',
+          '#64748b',
+          '#2563eb',
+          '#0d9488',
+          '#8b5cf6'
+        ]
+      }]
+    };
+  }
+
+  // Requests by priority bar chart
+  get priorityChartData(): ChartData<'bar', number[], string> {
+    const labels = [...this.priorities];
+
+    return {
+      labels,
+      datasets: [{
+        label: 'Requests',
+        data: labels.map(priority =>
+          this.requests.filter(request => request.priority === priority).length
+        ),
+        backgroundColor: [
+          '#94a3b8',
+          '#3b82f6',
+          '#f97316',
+          '#ef4444'
+        ],
+        borderRadius: 6
+      }]
+    };
+  }
+
+  // Purchase order status doughnut chart
+  get purchaseOrderStatusChartData(): ChartData<'doughnut', number[], string> {
+    const labels = [
+      'Pending',
+      'Approved',
+      'Ordered',
+      'Delivered',
+      'Completed',
+      'Cancelled'
+    ];
+
+    return {
+      labels,
+      datasets: [{
+        data: labels.map(status =>
+          this.purchaseOrders.filter(order => order.status === status).length
+        ),
+        backgroundColor: [
+          '#f59e0b',
+          '#2563eb',
+          '#8b5cf6',
+          '#0d9488',
+          '#16a34a',
+          '#94a3b8'
+        ]
+      }]
+    };
+  }
+
+  // Procurement value by category bar chart
+  get categoryValueChartData(): ChartData<'bar', number[], string> {
+    const totals = new Map<string, number>();
+
+    for (const request of this.requests) {
+      const category = request.category?.trim() || 'Uncategorized';
+
+      totals.set(
+        category,
+        (totals.get(category) ?? 0) + Number(request.estimated_cost || 0)
+      );
+    }
+
+    const entries = [...totals.entries()].sort((a, b) => b[1] - a[1]);
+
+    return {
+      labels: entries.map(([category]) => category),
+      datasets: [{
+        label: 'Estimated value (₹)',
+        data: entries.map(([, value]) => value),
+        backgroundColor: '#0f766e',
+        borderRadius: 6
+      }]
+    };
+  }
+
   form: ProcurementCreate = {
     title: '',
     vendor_id: null,
@@ -66,8 +210,65 @@ export class Procurement implements OnInit {
   constructor(
     private procurementService: ProcurementService,
     private vendorService: VendorService,
-    private purchaseOrderService: PurchaseOrderService
+    private purchaseOrderService: PurchaseOrderService,
+    public authService: AuthService
   ) {}
+
+  get currentRole(): string {
+    return this.authService.currentUser()?.role ?? '';
+  }
+
+  get isAdministrator(): boolean {
+    return this.currentRole === 'Administrator';
+  }
+
+  get canCreateRequest(): boolean {
+    return this.isAdministrator || this.currentRole === 'Procurement Manager';
+  }
+
+  canEditRequest(request: ProcurementRequest): boolean {
+    return this.isAdministrator || (
+      this.currentRole === 'Procurement Manager' && request.status === 'Pending'
+    );
+  }
+
+  canDeleteRequest(): boolean {
+    return this.isAdministrator;
+  }
+
+  getAllowedStatuses(request: ProcurementRequest): string[] {
+    const role = this.currentRole;
+
+    if (role === 'Administrator') {
+      return this.statuses.filter(status => status !== request.status);
+    }
+
+    if (role === 'Procurement Manager') {
+      const transitions: Record<string, string[]> = {
+        Pending: ['Cancelled'],
+        Approved: ['Ordered', 'Cancelled'],
+        Ordered: ['Delivered']
+      };
+
+      return transitions[request.status] ?? [];
+    }
+
+    if (role === 'Supply Chain Manager') {
+      const transitions: Record<string, string[]> = {
+        Pending: ['Approved', 'Rejected'],
+        Ordered: ['Delivered'],
+        Delivered: ['Completed']
+      };
+
+      return transitions[request.status] ?? [];
+    }
+
+    return [];
+  }
+
+  canChangeStatus(request: ProcurementRequest): boolean {
+    return this.getAllowedStatuses(request).length > 0;
+  }
 
   ngOnInit(): void {
     this.loadVendors();
@@ -88,7 +289,6 @@ export class Procurement implements OnInit {
   }
 
   loadRequests(): void {
-
     this.loading = true;
     this.errorMessage = '';
 
@@ -118,7 +318,6 @@ export class Procurement implements OnInit {
   }
 
   loadPurchaseOrders(): void {
-
     this.loadingPurchaseOrders = true;
 
     this.purchaseOrderService
@@ -158,6 +357,10 @@ export class Procurement implements OnInit {
   }
 
   openCreateForm(): void {
+    if (!this.canCreateRequest) {
+      this.errorMessage = 'Your role cannot create procurement requests.';
+      return;
+    }
 
     this.editingId = null;
 
@@ -176,6 +379,10 @@ export class Procurement implements OnInit {
   }
 
   openEditForm(request: ProcurementRequest): void {
+    if (!this.canEditRequest(request)) {
+      this.errorMessage = 'You cannot edit this procurement request in its current state.';
+      return;
+    }
 
     this.editingId = request.id;
 
@@ -194,7 +401,6 @@ export class Procurement implements OnInit {
   }
 
   closeForm(): void {
-
     if (this.saving) {
       return;
     }
@@ -204,7 +410,6 @@ export class Procurement implements OnInit {
   }
 
   saveRequest(formRef: NgForm): void {
-
     if (formRef.invalid || this.saving) {
       formRef.control.markAllAsTouched();
       return;
@@ -215,12 +420,10 @@ export class Procurement implements OnInit {
     this.errorMessage = '';
 
     if (this.editingId === null) {
-
       this.procurementService
         .createRequest(this.form)
         .subscribe({
           next: (request) => {
-
             this.requests = [
               request,
               ...this.requests
@@ -234,7 +437,6 @@ export class Procurement implements OnInit {
           },
 
           error: (error) => {
-
             this.saving = false;
 
             this.handleApiError(
@@ -243,9 +445,7 @@ export class Procurement implements OnInit {
             );
           }
         });
-
     } else {
-
       this.procurementService
         .updateRequest(
           this.editingId,
@@ -253,7 +453,6 @@ export class Procurement implements OnInit {
         )
         .subscribe({
           next: (request) => {
-
             this.requests = this.requests.map(
               existing =>
                 existing.id === request.id
@@ -270,7 +469,6 @@ export class Procurement implements OnInit {
           },
 
           error: (error) => {
-
             this.saving = false;
 
             this.handleApiError(
@@ -286,8 +484,12 @@ export class Procurement implements OnInit {
     request: ProcurementRequest,
     newStatus: string
   ): void {
-
     if (request.status === newStatus) {
+      return;
+    }
+
+    if (!this.getAllowedStatuses(request).includes(newStatus)) {
+      this.errorMessage = 'This status transition is not available for your role.';
       return;
     }
 
@@ -301,7 +503,6 @@ export class Procurement implements OnInit {
       )
       .subscribe({
         next: (updatedRequest) => {
-
           this.requests = this.requests.map(
             existing =>
               existing.id === updatedRequest.id
@@ -314,7 +515,6 @@ export class Procurement implements OnInit {
         },
 
         error: (error) => {
-
           this.handleApiError(
             error,
             'Unable to update request status.'
@@ -326,6 +526,10 @@ export class Procurement implements OnInit {
   }
 
   deleteRequest(request: ProcurementRequest): void {
+    if (!this.canDeleteRequest()) {
+      this.errorMessage = 'Only an Administrator can delete procurement requests.';
+      return;
+    }
 
     const confirmed = window.confirm(
       `Delete procurement request "${request.title}"?`
@@ -342,7 +546,6 @@ export class Procurement implements OnInit {
       .deleteRequest(request.id)
       .subscribe({
         next: () => {
-
           this.requests = this.requests.filter(
             item => item.id !== request.id
           );
@@ -352,7 +555,6 @@ export class Procurement implements OnInit {
         },
 
         error: (error) => {
-
           this.handleApiError(
             error,
             'Unable to delete procurement request.'
@@ -381,6 +583,12 @@ export class Procurement implements OnInit {
     ).length;
   }
 
+  get rejectedRequests(): number {
+    return this.requests.filter(
+      request => request.status === 'Rejected'
+    ).length;
+  }
+
   get completedRequests(): number {
     return this.requests.filter(
       request => request.status === 'Completed'
@@ -396,7 +604,6 @@ export class Procurement implements OnInit {
   }
 
   get completionRate(): number {
-
     if (this.requests.length === 0) {
       return 0;
     }
@@ -409,8 +616,7 @@ export class Procurement implements OnInit {
 
   /*
    * PURCHASE ORDER SUMMARY
-   * These values now come from the real
-   * purchase_orders PostgreSQL table.
+   * These values come from the purchase_orders table.
    */
 
   get activePOs(): number {
@@ -434,7 +640,6 @@ export class Procurement implements OnInit {
   }
 
   get overduePOs(): number {
-
     const today = new Date();
 
     today.setHours(
@@ -445,7 +650,6 @@ export class Procurement implements OnInit {
     );
 
     return this.purchaseOrders.filter(order => {
-
       const deliveryDate =
         new Date(order.expected_delivery_date);
 
@@ -469,7 +673,6 @@ export class Procurement implements OnInit {
   }
 
   get poValue(): number {
-
     return this.purchaseOrders
       .filter(
         order =>
@@ -483,7 +686,6 @@ export class Procurement implements OnInit {
   }
 
   get assignedVendorCount(): number {
-
     return new Set(
       this.purchaseOrders
         .filter(
@@ -501,7 +703,6 @@ export class Procurement implements OnInit {
    */
 
   get totalDeliveries(): number {
-
     return this.purchaseOrders.filter(
       order =>
         order.status === 'Delivered' ||
@@ -510,7 +711,6 @@ export class Procurement implements OnInit {
   }
 
   get onTimeDeliveries(): number {
-
     return this.purchaseOrders.filter(
       order =>
         order.status === 'Delivered' ||
@@ -519,7 +719,6 @@ export class Procurement implements OnInit {
   }
 
   get delayedDeliveries(): number {
-
     const today = new Date();
 
     today.setHours(
@@ -530,7 +729,6 @@ export class Procurement implements OnInit {
     );
 
     return this.purchaseOrders.filter(order => {
-
       const deliveryDate =
         new Date(order.expected_delivery_date);
 
@@ -554,7 +752,6 @@ export class Procurement implements OnInit {
   }
 
   get pendingDeliveries(): number {
-
     return this.purchaseOrders.filter(
       order =>
         order.status === 'Approved' ||
@@ -563,7 +760,6 @@ export class Procurement implements OnInit {
   }
 
   get deliveryRate(): number {
-
     const activeDeliveryOrders =
       this.purchaseOrders.filter(
         order =>
@@ -581,7 +777,6 @@ export class Procurement implements OnInit {
   }
 
   getVendorName(vendorId: number | null): string {
-
     if (vendorId === null) {
       return 'Not assigned';
     }
@@ -596,7 +791,6 @@ export class Procurement implements OnInit {
   }
 
   formatCurrency(value: number): string {
-
     return new Intl.NumberFormat(
       'en-IN',
       {
@@ -608,7 +802,6 @@ export class Procurement implements OnInit {
   }
 
   formatDate(value: string): string {
-
     return new Date(value).toLocaleDateString(
       'en-IN',
       {
@@ -623,7 +816,6 @@ export class Procurement implements OnInit {
     error: any,
     fallbackMessage: string
   ): void {
-
     if (error?.status === 401) {
       this.errorMessage =
         'Your session has expired. Please log in again.';

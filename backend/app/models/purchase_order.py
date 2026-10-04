@@ -1,3 +1,4 @@
+
 from datetime import date, datetime
 from decimal import Decimal
 
@@ -31,6 +32,16 @@ class PurchaseOrder(Base):
     expected_delivery_date: Mapped[date] = mapped_column(
         Date,
         nullable=False
+    )
+
+    actual_delivery_date: Mapped[date | None] = mapped_column(
+        Date,
+        nullable=True
+    )
+
+    delivery_notes: Mapped[str | None] = mapped_column(
+        Text,
+        nullable=True
     )
 
     procurement_request_id: Mapped[int | None] = mapped_column(

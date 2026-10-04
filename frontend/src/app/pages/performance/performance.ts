@@ -12,7 +12,6 @@ import {
   DatasetAnalyticsService
 } from '../../core/services/dataset-analytics';
 
-
 @Component({
   selector: 'app-performance',
   standalone: true,
@@ -21,6 +20,10 @@ import {
   styleUrl: './performance.scss'
 })
 export class Performance implements OnInit {
+
+  // ============================================================
+  // Vendor Performance
+  // ============================================================
 
   summaries: VendorPerformanceSummary[] = [];
 
@@ -34,7 +37,9 @@ export class Performance implements OnInit {
 
   errorMessage = '';
 
-  historyErrorMessage = '';
+  // ============================================================
+  // Supply Chain Dataset Benchmark
+  // ============================================================
 
   datasetAnalytics: DatasetAnalytics | null = null;
 
@@ -42,6 +47,9 @@ export class Performance implements OnInit {
 
   datasetErrorMessage = '';
 
+  // ============================================================
+  // Constructor
+  // ============================================================
 
   constructor(
     private performanceService: VendorPerformanceService,
@@ -49,261 +57,154 @@ export class Performance implements OnInit {
     private cdr: ChangeDetectorRef
   ) {}
 
+  // ============================================================
+  // Initial Load
+  // ============================================================
 
   ngOnInit(): void {
-
     this.loadPerformance();
-
     this.loadDatasetAnalytics();
-
   }
 
+  // ============================================================
+  // Vendor Performance
+  // ============================================================
 
   loadPerformance(): void {
-
     this.loading = true;
-
     this.errorMessage = '';
 
-    this.performanceService
-      .getPerformanceSummaries()
-      .subscribe({
+    this.performanceService.getPerformanceSummaries().subscribe({
+      next: (data: VendorPerformanceSummary[]) => {
+        this.summaries = data || [];
 
-        next: (
-          data: VendorPerformanceSummary[]
-        ) => {
-
-          this.summaries = data || [];
-
-          if (this.summaries.length > 0) {
-
-            this.selectedVendor =
-              this.summaries[0];
-
-            this.loadHistory(
-              this.selectedVendor.vendor_id
-            );
-
-          } else {
-
-            this.selectedVendor = null;
-
-            this.history = [];
-
-          }
-
-          this.loading = false;
-
-          this.cdr.detectChanges();
-
-        },
-
-
-        error: (error) => {
-
-          console.error(
-            'Unable to load vendor performance:',
-            error
-          );
-
-          this.errorMessage =
-            error?.error?.detail ||
-            'Unable to load vendor performance data. Please try again.';
-
-          this.summaries = [];
-
+        if (this.summaries.length > 0) {
+          this.selectedVendor = this.summaries[0];
+          this.loadHistory(this.selectedVendor.vendor_id);
+        } else {
           this.selectedVendor = null;
-
           this.history = [];
-
-          this.loading = false;
-
-          this.cdr.detectChanges();
-
         }
 
-      });
+        this.loading = false;
+        this.cdr.detectChanges();
+      },
 
+      error: (error) => {
+        console.error('Unable to load vendor performance:', error);
+
+        this.errorMessage =
+          error?.error?.detail ||
+          'Unable to load vendor performance data. Please try again.';
+
+        this.summaries = [];
+        this.selectedVendor = null;
+        this.history = [];
+        this.loading = false;
+
+        this.cdr.detectChanges();
+      }
+    });
   }
 
-
-  selectVendor(
-    vendor: VendorPerformanceSummary
-  ): void {
-
-    console.log(
-      'Selected vendor:',
-      vendor.vendor_id,
-      vendor.vendor_name
-    );
-
+  selectVendor(vendor: VendorPerformanceSummary): void {
     this.selectedVendor = vendor;
 
-    this.history = [];
-
-    this.historyErrorMessage = '';
-
-    this.loadHistory(
-      vendor.vendor_id
-    );
-
-    this.cdr.detectChanges();
-
+    this.loadHistory(vendor.vendor_id);
   }
 
-
-  loadHistory(
-    vendorId: number
-  ): void {
-
+  loadHistory(vendorId: number): void {
     this.historyLoading = true;
-
     this.history = [];
 
-    this.historyErrorMessage = '';
+    this.performanceService.getVendorHistory(vendorId).subscribe({
+      next: (data: VendorPerformanceHistory[]) => {
+        this.history = data || [];
+        this.historyLoading = false;
 
-    this.performanceService
-      .getVendorHistory(vendorId)
-      .subscribe({
+        this.cdr.detectChanges();
+      },
 
-        next: (
-          data: VendorPerformanceHistory[]
-        ) => {
+      error: (error) => {
+        console.error('Unable to load vendor performance history:', error);
 
-          this.history = data || [];
+        this.history = [];
+        this.historyLoading = false;
 
-          this.historyLoading = false;
-
-          this.cdr.detectChanges();
-
-        },
-
-
-        error: (error) => {
-
-          console.error(
-            'Unable to load vendor performance history:',
-            error
-          );
-
-          this.history = [];
-
-          this.historyErrorMessage =
-            error?.error?.detail ||
-            'Unable to load performance history for this vendor.';
-
-          this.historyLoading = false;
-
-          this.cdr.detectChanges();
-
-        }
-
-      });
-
+        this.cdr.detectChanges();
+      }
+    });
   }
 
+  // ============================================================
+  // Refresh
+  // ============================================================
 
   refresh(): void {
-
     this.loadPerformance();
-
     this.loadDatasetAnalytics();
-
   }
 
+  // ============================================================
+  // Dataset Analytics
+  // ============================================================
 
   loadDatasetAnalytics(): void {
-
     this.datasetLoading = true;
-
     this.datasetErrorMessage = '';
 
-    this.datasetAnalyticsService
-      .getDatasetAnalytics()
-      .subscribe({
+    this.datasetAnalyticsService.getDatasetAnalytics().subscribe({
+      next: (data: DatasetAnalytics) => {
+        this.datasetAnalytics = data;
+        this.datasetLoading = false;
 
-        next: (
-          data: DatasetAnalytics
-        ) => {
+        this.cdr.detectChanges();
+      },
 
-          this.datasetAnalytics = data;
+      error: (error) => {
+        console.error('Unable to load supply-chain dataset analytics:', error);
 
-          this.datasetLoading = false;
+        this.datasetAnalytics = null;
 
-          this.cdr.detectChanges();
+        this.datasetErrorMessage =
+          error?.error?.detail ||
+          'Unable to load supply-chain dataset analytics.';
 
-        },
+        this.datasetLoading = false;
 
-
-        error: (error) => {
-
-          console.error(
-            'Unable to load supply-chain dataset analytics:',
-            error
-          );
-
-          this.datasetAnalytics = null;
-
-          this.datasetErrorMessage =
-            error?.error?.detail ||
-            'Unable to load supply-chain dataset analytics.';
-
-          this.datasetLoading = false;
-
-          this.cdr.detectChanges();
-
-        }
-
-      });
-
+        this.cdr.detectChanges();
+      }
+    });
   }
 
+  // ============================================================
+  // Performance Score Styling
+  // ============================================================
 
-  getScoreClass(
-    score: number | null | undefined
-  ): string {
-
-    if (
-      score === null ||
-      score === undefined ||
-      Number.isNaN(Number(score))
-    ) {
-
-      return 'not-evaluated';
-
-    }
-
-    const value = Number(score);
+  getScoreClass(score: number | null | undefined): string {
+    const value = Number(score || 0);
 
     if (value >= 80) {
-
       return 'excellent';
-
     }
 
     if (value >= 65) {
-
       return 'good';
-
     }
 
     if (value >= 50) {
-
       return 'attention';
-
     }
 
     return 'poor';
-
   }
 
+  // ============================================================
+  // Delivery Status Styling
+  // ============================================================
 
-  getDeliveryClass(
-    status: string | null | undefined
-  ): string {
-
-    const value =
-      String(status || '').toLowerCase();
+  getDeliveryClass(status: string | null | undefined): string {
+    const value = String(status || '').toLowerCase();
 
     if (
       value.includes('on-time') ||
@@ -311,148 +212,91 @@ export class Performance implements OnInit {
       value.includes('advance') ||
       value.includes('delivered')
     ) {
-
       return 'on-time';
-
     }
 
     if (
       value.includes('delay') ||
       value.includes('late')
     ) {
-
       return 'delayed';
-
     }
 
     return 'pending';
-
   }
 
+  // ============================================================
+  // Number Formatting
+  // ============================================================
 
   formatNumber(
     value: number | null | undefined,
     decimals = 1
   ): string {
-
-    if (
-      value === null ||
-      value === undefined ||
-      Number.isNaN(Number(value))
-    ) {
-
+    if (value === null || value === undefined || Number.isNaN(Number(value))) {
       return '—';
-
     }
 
-    return Number(value).toFixed(
-      decimals
-    );
-
+    return Number(value).toFixed(decimals);
   }
 
+  // ============================================================
+  // Date Formatting
+  // ============================================================
 
-  formatDate(
-    value: string | null | undefined
-  ): string {
-
+  formatDate(value: string | null | undefined): string {
     if (!value) {
-
       return '—';
-
     }
 
     const date = new Date(value);
 
     if (Number.isNaN(date.getTime())) {
-
       return '—';
-
     }
 
-    return date.toLocaleDateString(
-      'en-IN',
-      {
-        day: '2-digit',
-        month: 'short',
-        year: 'numeric'
-      }
-    );
-
+    return date.toLocaleDateString('en-IN', {
+      day: '2-digit',
+      month: 'short',
+      year: 'numeric'
+    });
   }
 
+  // ============================================================
+  // Dataset Helpers
+  // ============================================================
 
-  integer(
-    value: number | null | undefined
-  ): string {
-
-    if (
-      value === null ||
-      value === undefined ||
-      Number.isNaN(Number(value))
-    ) {
-
+  integer(value: number | null | undefined): string {
+    if (value === null || value === undefined || Number.isNaN(Number(value))) {
       return '—';
-
     }
 
-    return Math
-      .round(Number(value))
-      .toLocaleString('en-IN');
-
+    return Math.round(Number(value)).toLocaleString('en-IN');
   }
 
-
-  percentage(
-    value: number | null | undefined
-  ): string {
-
-    if (
-      value === null ||
-      value === undefined ||
-      Number.isNaN(Number(value))
-    ) {
-
+  percentage(value: number | null | undefined): string {
+    if (value === null || value === undefined || Number.isNaN(Number(value))) {
       return '—';
-
     }
 
     return `${Number(value).toFixed(2)}%`;
-
   }
 
-
-  days(
-    value: number | null | undefined
-  ): string {
-
-    if (
-      value === null ||
-      value === undefined ||
-      Number.isNaN(Number(value))
-    ) {
-
+  days(value: number | null | undefined): string {
+    if (value === null || value === undefined || Number.isNaN(Number(value))) {
       return '—';
-
     }
 
     return `${Number(value).toFixed(2)} days`;
-
   }
 
-
-  datasetProgress(
-    value: number | null | undefined
-  ): number {
-
+  datasetProgress(value: number | null | undefined): number {
     if (
       !this.datasetAnalytics ||
       value === null ||
       value === undefined
     ) {
-
       return 0;
-
     }
 
     const total =
@@ -462,15 +306,9 @@ export class Performance implements OnInit {
       this.datasetAnalytics.delivery_status.shipping_canceled;
 
     if (total <= 0) {
-
       return 0;
-
     }
 
-    return (
-      Number(value) / total
-    ) * 100;
-
+    return (Number(value) / total) * 100;
   }
-
 }

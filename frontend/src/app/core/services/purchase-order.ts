@@ -1,3 +1,4 @@
+
 import { Injectable } from '@angular/core';
 import {
   HttpClient,
@@ -52,11 +53,18 @@ export interface PurchaseOrderCreate {
   items: PurchaseOrderItemCreate[];
 }
 
+export interface DeliveryUpdate {
+  actual_delivery_date: string;
+  delivery_notes: string | null;
+}
+
 export interface PurchaseOrder {
   id: number;
   po_number: string;
   order_date: string;
   expected_delivery_date: string;
+  actual_delivery_date: string | null;
+  delivery_notes: string | null;
   procurement_request_id: number | null;
   department: string;
   vendor_id: number;
@@ -156,6 +164,17 @@ export class PurchaseOrderService {
     return this.http.patch<PurchaseOrder>(
       `${this.apiUrl}/${id}/status`,
       { status }
+    );
+  }
+
+  updateDelivery(
+    id: number,
+    delivery: DeliveryUpdate
+  ): Observable<PurchaseOrder> {
+
+    return this.http.patch<PurchaseOrder>(
+      `${this.apiUrl}/${id}/delivery`,
+      delivery
     );
   }
 

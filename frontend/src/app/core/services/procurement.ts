@@ -15,7 +15,8 @@ export const PROCUREMENT_STATUSES = [
   'Ordered',
   'Delivered',
   'Completed',
-  'Cancelled'
+  'Cancelled',
+  'Rejected'
 ];
 
 export interface ProcurementRequest {

@@ -18,6 +18,7 @@ PROCUREMENT_STATUSES = [
     "Delivered",
     "Completed",
     "Cancelled",
+    "Rejected",
 ]
 
 

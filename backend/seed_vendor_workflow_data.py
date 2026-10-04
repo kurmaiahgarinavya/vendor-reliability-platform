@@ -651,8 +651,6 @@ def create_performance(
 
     results = []
 
-    # Different performance patterns so every vendor gets
-    # meaningful quality/service/response/resolution values.
     performance_values = [
         (4.6, 4.5, 4.0, 5.0, -1),
         (4.2, 4.0, 6.0, 8.0, 2),
@@ -660,37 +658,29 @@ def create_performance(
         (4.4, 4.3, 5.0, 7.0, 0),
         (4.9, 4.8, 2.5, 3.0, -3),
         (4.1, 4.0, 7.0, 10.0, 3),
-        (4.5, 4.4, 4.5, 6.0, 0),
-        (4.3, 4.2, 5.5, 7.5, 1),
-        (4.7, 4.6, 3.5, 4.5, -1),
-        (4.0, 3.9, 8.0, 11.0, 4),
     ]
 
     columns = table_columns(
         VendorPerformance
     )
 
-    # Create at least one performance evaluation for EVERY vendor.
-    # If a vendor has a purchase order, link the evaluation to it.
-    # If the vendor has no purchase order, keep purchase_order_id as None.
-    for index, vendor in enumerate(vendors):
+    for index, order in enumerate(
+        purchase_orders
+    ):
 
         existing = (
             db.query(VendorPerformance)
             .filter(
                 VendorPerformance.vendor_id
-                == vendor.id,
+                == order.vendor_id,
+                VendorPerformance.purchase_order_id
+                == order.id,
             )
             .first()
         )
 
         if existing:
             results.append(existing)
-            print(
-                f"Already exists: {vendor.name} | "
-                f"Quality {existing.quality_rating}/5 | "
-                f"Service {existing.service_rating}/5"
-            )
             continue
 
         (
@@ -703,40 +693,23 @@ def create_performance(
             index % len(performance_values)
         ]
 
-        # Use the vendor's first available purchase order, if any.
-        order = next(
-            (
-                purchase_order
-                for purchase_order in purchase_orders
-                if purchase_order.vendor_id == vendor.id
-            ),
-            None,
+        actual_delivery = (
+            order.expected_delivery_date
+            + timedelta(
+                days=delivery_offset
+            )
         )
 
-        actual_delivery = None
-        delivery_status = "Not Evaluated"
-        purchase_order_id = None
-
-        if order:
-            purchase_order_id = order.id
-
-            actual_delivery = (
-                order.expected_delivery_date
-                + timedelta(
-                    days=delivery_offset
-                )
-            )
-
-            delivery_status = (
-                "On Time"
-                if actual_delivery
-                <= order.expected_delivery_date
-                else "Delayed"
-            )
+        delivery_status = (
+            "On Time"
+            if actual_delivery
+            <= order.expected_delivery_date
+            else "Delayed"
+        )
 
         data = {
-            "vendor_id": vendor.id,
-            "purchase_order_id": purchase_order_id,
+            "vendor_id": order.vendor_id,
+            "purchase_order_id": order.id,
             "actual_delivery_date": actual_delivery,
             "delivery_status": delivery_status,
             "quality_rating": Decimal(
@@ -751,9 +724,8 @@ def create_performance(
             "issue_resolution_time_hours": Decimal(
                 str(resolution)
             ),
-            "issue_count": 0,
             "evaluation_date": TODAY,
-            "notes": (
+            "comments": (
                 "VendorIQ demonstration "
                 "performance evaluation"
             ),
@@ -767,21 +739,12 @@ def create_performance(
 
         results.append(evaluation)
 
-        if order:
-            print(
-                f"{order.po_number} | "
-                f"{vendor.name} | "
-                f"Quality {quality}/5 | "
-                f"Service {service}/5 | "
-                f"{delivery_status}"
-            )
-        else:
-            print(
-                f"{vendor.name} | "
-                f"Quality {quality}/5 | "
-                f"Service {service}/5 | "
-                f"Performance evaluation created"
-            )
+        print(
+            f"{order.po_number} | "
+            f"Quality {quality}/5 | "
+            f"Service {service}/5 | "
+            f"{delivery_status}"
+        )
 
     db.commit()
 
@@ -1203,8 +1166,9 @@ def main():
 
             return
 
-        # Keep all approved vendors so every vendor
-        # can receive a performance evaluation.
+        # Use at least 6 vendors.
+        vendors = vendors[:6]
+
         print(
             f"Approved vendors available: "
             f"{len(vendors)}"

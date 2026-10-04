@@ -1,9 +1,11 @@
+
 .users-page {
   width: 100%;
   max-width: 1500px;
   margin: 0 auto;
   padding: 8px 4px 40px;
   box-sizing: border-box;
+  color: #eaf1fb;
 }
 
 .page-header {
@@ -15,24 +17,24 @@
 }
 
 .eyebrow {
+  margin-bottom: 8px;
+  color: #60a5fa;
   font-size: 11px;
   font-weight: 700;
   letter-spacing: 1.6px;
-  color: #64748b;
-  margin-bottom: 8px;
 }
 
 .page-header h1 {
   margin: 0;
+  color: #eaf1fb;
   font-size: 30px;
   line-height: 1.2;
   font-weight: 750;
-  color: #0f172a;
 }
 
 .page-header p {
   margin: 8px 0 0;
-  color: #64748b;
+  color: #9aadc6;
   font-size: 14px;
 }
 
@@ -42,23 +44,23 @@
   gap: 8px;
   height: 42px;
   padding: 0 17px;
-  border: 1px solid #dbe3ec;
+  border: 1px solid #294666;
   border-radius: 9px;
-  background: #ffffff;
-  color: #334155;
+  background: #10233d;
+  color: #eaf1fb;
   font-size: 13px;
   font-weight: 650;
   cursor: pointer;
-  transition: all 0.2s ease;
+  transition: background .2s, border-color .2s;
 }
 
 .refresh-button:hover:not(:disabled) {
-  border-color: #94a3b8;
-  background: #f8fafc;
+  border-color: #3b82f6;
+  background: #193657;
 }
 
 .refresh-button:disabled {
-  opacity: 0.55;
+  opacity: .55;
   cursor: not-allowed;
 }
 
@@ -66,7 +68,6 @@
   font-size: 18px;
   line-height: 1;
 }
-
 
 .summary-grid {
   display: grid;
@@ -76,23 +77,23 @@
 }
 
 .summary-card {
-  min-height: 112px;
   display: flex;
   align-items: center;
   gap: 15px;
+  min-height: 112px;
   padding: 20px;
   box-sizing: border-box;
-  background: #ffffff;
-  border: 1px solid #e5eaf0;
+  border: 1px solid #203957;
   border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.035);
+  background: #10233d;
+  box-shadow: 0 5px 16px rgba(0, 0, 0, .15);
 }
 
 .summary-icon {
+  display: flex;
   width: 44px;
   height: 44px;
   flex: 0 0 44px;
-  display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 10px;
@@ -101,23 +102,23 @@
 }
 
 .total-icon {
-  background: #eef2ff;
-  color: #4f46e5;
+  background: #17365a;
+  color: #93c5fd;
 }
 
 .active-icon {
-  background: #ecfdf5;
-  color: #059669;
+  background: #123b35;
+  color: #4ade80;
 }
 
 .inactive-icon {
-  background: #f1f5f9;
-  color: #64748b;
+  background: #203957;
+  color: #9aadc6;
 }
 
 .admin-icon {
-  background: #fff7ed;
-  color: #ea580c;
+  background: #493719;
+  color: #fbbf24;
 }
 
 .summary-content {
@@ -127,57 +128,55 @@
 }
 
 .summary-label {
-  color: #64748b;
+  color: #9aadc6;
   font-size: 12px;
   font-weight: 600;
 }
 
 .summary-content strong {
-  color: #0f172a;
+  color: #eaf1fb;
   font-size: 24px;
   font-weight: 750;
 }
 
-
 .users-card {
-  background: #ffffff;
-  border: 1px solid #e5eaf0;
-  border-radius: 12px;
-  box-shadow: 0 2px 8px rgba(15, 23, 42, 0.035);
   overflow: hidden;
+  border: 1px solid #203957;
+  border-radius: 12px;
+  background: #10233d;
+  box-shadow: 0 5px 16px rgba(0, 0, 0, .15);
 }
 
 .card-header {
-  min-height: 76px;
-  padding: 18px 22px;
   display: flex;
+  min-height: 76px;
   align-items: center;
   justify-content: space-between;
   gap: 20px;
-  border-bottom: 1px solid #e8edf2;
+  padding: 18px 22px;
   box-sizing: border-box;
+  border-bottom: 1px solid #203957;
 }
 
 .card-header h2 {
   margin: 0;
-  color: #0f172a;
+  color: #eaf1fb;
   font-size: 16px;
   font-weight: 700;
 }
 
 .card-header p {
   margin: 5px 0 0;
-  color: #64748b;
+  color: #9aadc6;
   font-size: 12px;
 }
 
 .record-count {
-  color: #64748b;
+  color: #9aadc6;
   font-size: 12px;
   font-weight: 600;
   white-space: nowrap;
 }
-
 
 .table-wrapper {
   width: 100%;
@@ -186,29 +185,35 @@
 
 table {
   width: 100%;
-  border-collapse: collapse;
   min-width: 760px;
+  border-collapse: collapse;
+  color: #eaf1fb;
 }
 
 thead {
-  background: #f8fafc;
+  background: #0c1b31;
 }
 
 th {
   padding: 13px 20px;
+  border-bottom: 1px solid #203957;
+  color: #9aadc6;
   text-align: left;
-  color: #64748b;
   font-size: 10px;
   font-weight: 750;
-  letter-spacing: 0.8px;
+  letter-spacing: .8px;
   text-transform: uppercase;
-  border-bottom: 1px solid #e8edf2;
 }
 
 td {
   padding: 16px 20px;
-  border-bottom: 1px solid #edf1f5;
+  border-bottom: 1px solid #203957;
   vertical-align: middle;
+}
+
+tbody tr {
+  background: #10233d;
+  transition: background .15s ease;
 }
 
 tbody tr:last-child td {
@@ -216,9 +221,8 @@ tbody tr:last-child td {
 }
 
 tbody tr:hover {
-  background: #fafcff;
+  background: #152b49;
 }
-
 
 .user-cell {
   display: flex;
@@ -227,15 +231,15 @@ tbody tr:hover {
 }
 
 .avatar {
+  display: flex;
   width: 38px;
   height: 38px;
   flex: 0 0 38px;
-  display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 50%;
-  background: #eef2ff;
-  color: #4338ca;
+  background: #17365a;
+  color: #93c5fd;
   font-size: 12px;
   font-weight: 750;
 }
@@ -247,18 +251,18 @@ tbody tr:hover {
 }
 
 .user-info strong {
-  color: #1e293b;
+  color: #eaf1fb;
   font-size: 13px;
   font-weight: 700;
 }
 
 .user-info span {
-  color: #94a3b8;
+  color: #8299b7;
   font-size: 11px;
 }
 
 .email {
-  color: #475569;
+  color: #c1cee0;
   font-size: 13px;
 }
 
@@ -266,6 +270,7 @@ tbody tr:hover {
   display: inline-flex;
   align-items: center;
   padding: 6px 9px;
+  border: 1px solid transparent;
   border-radius: 6px;
   font-size: 11px;
   font-weight: 700;
@@ -273,38 +278,45 @@ tbody tr:hover {
 }
 
 .role-admin {
-  background: #fff7ed;
-  color: #c2410c;
+  border-color: #76502b;
+  background: #493719;
+  color: #fbbf24;
 }
 
 .role-procurement {
-  background: #eff6ff;
-  color: #2563eb;
+  border-color: #294f81;
+  background: #17365a;
+  color: #93c5fd;
 }
 
 .role-supply {
-  background: #f0fdfa;
-  color: #0f766e;
+  border-color: #23634d;
+  background: #123b35;
+  color: #6ee7b7;
 }
 
 .role-vendor {
-  background: #f5f3ff;
-  color: #7c3aed;
+  border-color: #57418b;
+  background: #30244f;
+  color: #c4b5fd;
 }
 
 .role-finance {
-  background: #ecfdf5;
-  color: #047857;
+  border-color: #23634d;
+  background: #123b35;
+  color: #4ade80;
 }
 
 .role-auditor {
-  background: #f8fafc;
-  color: #475569;
+  border-color: #294666;
+  background: #203957;
+  color: #c1cee0;
 }
 
 .role-default {
-  background: #f1f5f9;
-  color: #475569;
+  border-color: #294666;
+  background: #203957;
+  color: #c1cee0;
 }
 
 .status-badge {
@@ -316,75 +328,72 @@ tbody tr:hover {
 }
 
 .status-dot {
+  display: inline-block;
   width: 7px;
   height: 7px;
   border-radius: 50%;
-  display: inline-block;
 }
 
 .status-active {
-  color: #047857;
+  color: #4ade80;
 }
 
 .status-active .status-dot {
-  background: #10b981;
+  background: #22c55e;
 }
 
 .status-inactive {
-  color: #64748b;
+  color: #9aadc6;
 }
 
 .status-inactive .status-dot {
-  background: #94a3b8;
+  background: #7187a5;
 }
 
 .user-id {
-  color: #94a3b8;
+  color: #9aadc6;
   font-family: monospace;
   font-size: 12px;
 }
 
-
 .loading-state,
 .empty-state,
 .error-state {
-  min-height: 260px;
   display: flex;
+  min-height: 260px;
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  text-align: center;
   padding: 30px;
   box-sizing: border-box;
+  text-align: center;
 }
 
 .loading-state p,
 .empty-state p {
   margin: 12px 0 0;
-  color: #64748b;
+  color: #9aadc6;
   font-size: 13px;
 }
 
 .loader {
   width: 30px;
   height: 30px;
-  border: 3px solid #e2e8f0;
-  border-top-color: #4f46e5;
+  border: 3px solid #203957;
+  border-top-color: #3b82f6;
   border-radius: 50%;
-  animation: spin 0.8s linear infinite;
+  animation: spin .8s linear infinite;
 }
 
 @keyframes spin {
-  to {
-    transform: rotate(360deg);
-  }
+  to { transform: rotate(360deg); }
 }
 
 .empty-icon,
 .error-icon {
+  display: flex;
   width: 46px;
   height: 46px;
-  display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 12px;
@@ -393,13 +402,13 @@ tbody tr:hover {
 }
 
 .empty-icon {
-  background: #f1f5f9;
-  color: #64748b;
+  background: #203957;
+  color: #9aadc6;
 }
 
 .empty-state h3 {
   margin: 14px 0 0;
-  color: #334155;
+  color: #eaf1fb;
   font-size: 15px;
 }
 
@@ -411,37 +420,36 @@ tbody tr:hover {
 
 .error-icon {
   flex: 0 0 46px;
-  background: #fef2f2;
-  color: #dc2626;
+  background: #48252e;
+  color: #f87171;
 }
 
 .error-state strong {
-  color: #991b1b;
+  color: #fca5a5;
   font-size: 14px;
 }
 
 .error-state p {
   margin: 4px 0 0;
-  color: #7f1d1d;
+  color: #fca5a5;
   font-size: 12px;
 }
 
 .retry-button {
-  margin-left: 10px;
-  border: 1px solid #fecaca;
-  background: #ffffff;
-  color: #b91c1c;
-  border-radius: 7px;
   padding: 8px 12px;
+  margin-left: 10px;
+  border: 1px solid #71343f;
+  border-radius: 7px;
+  background: #321e2b;
+  color: #fca5a5;
   font-size: 12px;
   font-weight: 650;
   cursor: pointer;
 }
 
 .retry-button:hover {
-  background: #fef2f2;
+  background: #48252e;
 }
-
 
 @media (max-width: 1000px) {
   .summary-grid {

@@ -1,6 +1,5 @@
 from datetime import date
 from decimal import Decimal
-
 from pydantic import BaseModel
 
 
@@ -23,12 +22,14 @@ class VendorReliabilitySummary(BaseModel):
     category: str
     vendor_status: str
 
-    reliability_score: Decimal
-    supplier_ranking: int
+    reliability_score: Decimal | None
+    supplier_ranking: int | None
     procurement_risk_level: str
 
+    data_completeness: Decimal
+    available_factor_count: int
+    total_factor_count: int
+
     factors: list[ReliabilityFactor]
-
     trend: list[ReliabilityTrend]
-
     recommendations: list[str]

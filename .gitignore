@@ -11,3 +11,7 @@ dist/
 
 frontend_old/
 vendor-reliability-platform/
+
+# Angular cache
+.angular/
+**/.angular/

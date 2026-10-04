@@ -1,3 +1,4 @@
+
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
@@ -28,6 +29,30 @@ export interface NotificationSummary {
   compliance_alerts: number;
 }
 
+export interface RiskAlertFactor {
+  name: string;
+  score: number | null;
+  status: string;
+  description: string;
+}
+
+export interface RiskAlert {
+  vendor_id: number;
+  vendor_name?: string;
+  risk_level: string;
+  reliability_score?: number | null;
+  factors: RiskAlertFactor[];
+}
+
+export interface RiskAlertResponse {
+  total: number;
+  high_risk_count: number;
+  medium_risk_count: number;
+  unassessed_count: number;
+  alerts: RiskAlert[];
+  generated_at?: string;
+}
+
 @Injectable({
   providedIn: 'root'
 })
@@ -35,6 +60,9 @@ export class NotificationService {
 
   private readonly apiUrl =
     'http://127.0.0.1:8000/api/notifications';
+
+  private readonly riskAlertsUrl =
+    'http://127.0.0.1:8000/api/risk-alerts';
 
   constructor(private http: HttpClient) {}
 
@@ -72,6 +100,12 @@ export class NotificationService {
   deleteNotification(id: number): Observable<any> {
     return this.http.delete(
       `${this.apiUrl}/${id}`
+    );
+  }
+
+  getRiskAlerts(): Observable<RiskAlertResponse> {
+    return this.http.get<RiskAlertResponse>(
+      this.riskAlertsUrl
     );
   }
 }

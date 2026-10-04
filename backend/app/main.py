@@ -19,7 +19,7 @@ from app.core.config import settings
 from app.database import Base, engine
 
 from app.models.password_reset import PasswordResetToken
-
+from app.api.risk_alerts import router as risk_alerts_router
 from app.models import (
     User,
     Vendor,
@@ -28,6 +28,8 @@ from app.models import (
     PurchaseOrderItem,
     Invoice,
 )
+
+from app.models.vendor import VendorStatusHistory
 
 from app.models.contract import (
     Contract,
@@ -44,6 +46,7 @@ from app.models.notification import Notification
 _ = (
     User,
     Vendor,
+    VendorStatusHistory,
     ProcurementRequest,
     PurchaseOrder,
     PurchaseOrderItem,
@@ -62,19 +65,11 @@ _ = (
 Base.metadata.create_all(bind=engine)
 
 
-# ---------------------------------------------------------
-# FastAPI Application
-# ---------------------------------------------------------
-
 app = FastAPI(
     title="VendorIQ API",
     version="1.0.0",
 )
 
-
-# ---------------------------------------------------------
-# CORS Configuration
-# ---------------------------------------------------------
 
 allowed_origins = [
     "http://localhost:4200",
@@ -85,20 +80,12 @@ allowed_origins = [
 app.add_middleware(
     CORSMiddleware,
     allow_origins=allowed_origins,
-
-    # Also accept localhost/127.0.0.1 development ports
-    # used by Angular during local development.
     allow_origin_regex=r"^https?://(localhost|127\.0\.0\.1)(:\d+)?$",
-
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
-
-# ---------------------------------------------------------
-# API Routers
-# ---------------------------------------------------------
 
 app.include_router(auth_router)
 app.include_router(users_router)
@@ -113,11 +100,7 @@ app.include_router(analytics_router)
 app.include_router(notifications_router)
 app.include_router(reports_router)
 app.include_router(dataset_analytics_router)
-
-
-# ---------------------------------------------------------
-# Root Endpoint
-# ---------------------------------------------------------
+app.include_router(risk_alerts_router)
 
 @app.get("/")
 def root():
@@ -125,10 +108,6 @@ def root():
         "message": "VendorIQ API is running"
     }
 
-
-# ---------------------------------------------------------
-# Health Endpoint
-# ---------------------------------------------------------
 
 @app.get("/health")
 def health():

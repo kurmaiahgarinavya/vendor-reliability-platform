@@ -1,3 +1,4 @@
+
 from datetime import datetime
 
 from fastapi import APIRouter, Depends, HTTPException, status
@@ -14,6 +15,7 @@ from app.models.procurement import ProcurementRequest
 from app.models.vendor import Vendor
 from app.schemas.purchase_order import (
     PURCHASE_ORDER_STATUSES,
+    DeliveryUpdate,
     InvoiceCreate,
     InvoiceResponse,
     InvoiceStatusUpdate,
@@ -114,7 +116,6 @@ def create_purchase_order(
 
     subtotal = 0
     tax_amount = 0
-
     calculated_items = []
 
     for item in order.items:
@@ -270,21 +271,60 @@ def update_purchase_order_status(
             detail="Purchase order not found",
         )
 
-    if (
-        status_data.status == "Approved"
-        and current_user.role.value
-        not in MANAGEMENT_ROLES
-    ):
-        raise HTTPException(
-            status_code=403,
-            detail="You do not have permission to approve purchase orders",
-        )
-
     if status_data.status == "Approved":
         order.approved_by = current_user.id
         order.approved_at = datetime.utcnow()
 
     order.status = status_data.status
+
+    db.commit()
+    db.refresh(order)
+
+    return _get_order_response(
+        db,
+        order.id,
+    )
+
+
+@router.patch(
+    "/{order_id}/delivery",
+    response_model=PurchaseOrderResponse
+)
+def update_purchase_order_delivery(
+    order_id: int,
+    delivery_data: DeliveryUpdate,
+    db: Session = Depends(get_db),
+    current_user=Depends(
+        require_roles(*MANAGEMENT_ROLES)
+    ),
+):
+    order = (
+        db.query(PurchaseOrder)
+        .filter(PurchaseOrder.id == order_id)
+        .first()
+    )
+
+    if not order:
+        raise HTTPException(
+            status_code=404,
+            detail="Purchase order not found",
+        )
+
+    if order.status not in ("Ordered", "Delivered"):
+        raise HTTPException(
+            status_code=400,
+            detail="Delivery can only be recorded for an Ordered purchase order",
+        )
+
+    if delivery_data.actual_delivery_date < order.order_date:
+        raise HTTPException(
+            status_code=400,
+            detail="Actual delivery date cannot be before the order date",
+        )
+
+    order.actual_delivery_date = delivery_data.actual_delivery_date
+    order.delivery_notes = delivery_data.delivery_notes
+    order.status = "Delivered"
 
     db.commit()
     db.refresh(order)
@@ -487,6 +527,8 @@ def _get_order_response(
         "po_number": order.po_number,
         "order_date": order.order_date,
         "expected_delivery_date": order.expected_delivery_date,
+        "actual_delivery_date": order.actual_delivery_date,
+        "delivery_notes": order.delivery_notes,
         "procurement_request_id": order.procurement_request_id,
         "department": order.department,
         "vendor_id": order.vendor_id,
