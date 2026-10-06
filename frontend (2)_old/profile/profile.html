@@ -1,0 +1,270 @@
+<div class="profile-page">
+
+  <!-- HEADER -->
+
+  <header class="profile-header">
+
+    <div>
+
+      <span class="eyebrow">
+        VENDOR PROFILE
+      </span>
+
+      <h1>
+        My Profile
+      </h1>
+
+      <p>
+        Manage your vendor contact information
+        and organization details.
+      </p>
+
+    </div>
+
+    <div class="profile-role">
+      VENDOR
+    </div>
+
+  </header>
+
+
+  <!-- SUCCESS -->
+
+  @if (successMessage) {
+
+    <div class="message success">
+      {{ successMessage }}
+    </div>
+
+  }
+
+
+  <!-- ERROR -->
+
+  @if (errorMessage) {
+
+    <div class="message error">
+      {{ errorMessage }}
+    </div>
+
+  }
+
+
+  @if (loading) {
+
+    <div class="loading-card">
+
+      <div class="loader"></div>
+
+      <strong>
+        Loading profile...
+      </strong>
+
+    </div>
+
+  }
+
+
+  @if (!loading) {
+
+    <section class="profile-layout">
+
+
+      <!-- PROFILE CARD -->
+
+      <div class="profile-card">
+
+        <div class="avatar">
+
+          {{ initials }}
+
+        </div>
+
+        <h2>
+          {{ profile.full_name || 'Vendor User' }}
+        </h2>
+
+        <span class="role-text">
+          Vendor
+        </span>
+
+        <div class="profile-divider"></div>
+
+        <div class="profile-summary">
+
+          <div>
+
+            <span>
+              Email
+            </span>
+
+            <strong>
+              {{ profile.email || 'Not available' }}
+            </strong>
+
+          </div>
+
+          <div>
+
+            <span>
+              Account
+            </span>
+
+            <strong class="active">
+              Active
+            </strong>
+
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- DETAILS -->
+
+      <div class="details-card">
+
+        <div class="card-heading">
+
+          <div>
+
+            <span class="eyebrow">
+              ACCOUNT INFORMATION
+            </span>
+
+            <h2>
+              Vendor Details
+            </h2>
+
+          </div>
+
+        </div>
+
+
+        <div class="form-grid">
+
+
+          <div class="form-field">
+
+            <label>
+              Full Name
+            </label>
+
+            <input
+              type="text"
+              [(ngModel)]="profile.full_name"
+              placeholder="Enter full name"
+            />
+
+          </div>
+
+
+          <div class="form-field">
+
+            <label>
+              Email Address
+            </label>
+
+            <input
+              type="email"
+              [(ngModel)]="profile.email"
+              readonly
+            />
+
+            <small>
+              Email is linked to your login account.
+            </small>
+
+          </div>
+
+
+          <div class="form-field">
+
+            <label>
+              Phone Number
+            </label>
+
+            <input
+              type="text"
+              [(ngModel)]="profile.phone"
+              placeholder="Enter phone number"
+            />
+
+          </div>
+
+
+          <div class="form-field">
+
+            <label>
+              Company Name
+            </label>
+
+            <input
+              type="text"
+              [(ngModel)]="profile.company_name"
+              placeholder="Enter company name"
+            />
+
+          </div>
+
+
+          <div class="form-field">
+
+            <label>
+              Vendor Category
+            </label>
+
+            <input
+              type="text"
+              [(ngModel)]="profile.category"
+              placeholder="Vendor category"
+            />
+
+          </div>
+
+
+          <div class="form-field">
+
+            <label>
+              Location
+            </label>
+
+            <input
+              type="text"
+              [(ngModel)]="profile.location"
+              placeholder="Enter location"
+            />
+
+          </div>
+
+
+        </div>
+
+
+        <div class="form-actions">
+
+          <button
+            type="button"
+            class="save-button"
+            (click)="saveProfile()"
+            [disabled]="saving"
+          >
+
+            @if (saving) {
+              Saving...
+            } @else {
+              Save Changes
+            }
+
+          </button>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  }
+
+</div>

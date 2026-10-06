@@ -1,0 +1,427 @@
+.contracts-page {
+  padding: 28px;
+  max-width: 1500px;
+  margin: 0 auto;
+  color: #111827;
+}
+
+.page-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0 0 6px;
+    font-size: 28px;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  p {
+    margin: 0;
+    color: #6b7280;
+  }
+}
+
+/* ============================================================
+   SUMMARY
+   ============================================================ */
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(6, 1fr);
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.summary-card {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  padding: 18px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  color: #111827;
+
+  span {
+    display: block;
+    color: #4b5563;
+    font-size: 13px;
+    margin-bottom: 8px;
+  }
+
+  strong {
+    display: block;
+    color: #111827;
+    font-size: 26px;
+    font-weight: 700;
+  }
+
+  &.warning {
+    border-left: 4px solid #f59e0b;
+  }
+}
+
+/* ============================================================
+   BUTTONS
+   ============================================================ */
+
+.primary-btn,
+.secondary-primary-btn,
+.secondary-btn,
+.delete-btn,
+.close-btn {
+  border: 0;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.primary-btn {
+  background: #2563eb;
+  color: #ffffff;
+  padding: 11px 18px;
+
+  &:hover {
+    background: #1d4ed8;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+.secondary-primary-btn {
+  background: #eff6ff;
+  color: #1d4ed8;
+  padding: 10px 15px;
+
+  &:hover {
+    background: #dbeafe;
+  }
+}
+
+.secondary-btn {
+  background: #f3f4f6;
+  color: #374151;
+  padding: 11px 18px;
+
+  &:hover {
+    background: #e5e7eb;
+  }
+}
+
+.delete-btn {
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 7px 11px;
+
+  &:hover {
+    background: #fecaca;
+  }
+}
+
+.close-btn {
+  background: transparent;
+  color: #374151;
+  font-size: 26px;
+
+  &:hover {
+    color: #111827;
+  }
+}
+
+/* ============================================================
+   ALERTS
+   ============================================================ */
+
+.alert {
+  padding: 12px 16px;
+  border-radius: 8px;
+  margin-bottom: 18px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.alert.success {
+  background: #dcfce7;
+  color: #166534;
+  border: 1px solid #bbf7d0;
+}
+
+.alert.error {
+  background: #fee2e2;
+  color: #991b1b;
+  border: 1px solid #fecaca;
+}
+
+/* ============================================================
+   CARDS
+   ============================================================ */
+
+.form-card,
+.section-card {
+  background: #ffffff;
+  border: 1px solid #d1d5db;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  color: #111827;
+}
+
+.form-card {
+  padding: 24px;
+}
+
+.section-card {
+  padding: 22px;
+}
+
+/* ============================================================
+   SECTION HEADINGS
+   ============================================================ */
+
+.section-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 15px;
+  margin-bottom: 20px;
+
+  h2 {
+    margin: 0 0 5px;
+    font-size: 19px;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 13px;
+  }
+}
+
+/* ============================================================
+   FORMS
+   ============================================================ */
+
+.inline-form {
+  background: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 20px;
+}
+
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.form-field {
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+  }
+
+  input,
+  select,
+  textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1px solid #cbd5e1;
+    border-radius: 7px;
+    padding: 10px 11px;
+    background: #ffffff;
+    color: #111827;
+    font: inherit;
+    outline: none;
+
+    &:focus {
+      border-color: #2563eb;
+      box-shadow: 0 0 0 2px rgba(37, 99, 235, 0.1);
+    }
+
+    &::placeholder {
+      color: #9ca3af;
+    }
+  }
+
+  select {
+    cursor: pointer;
+  }
+
+  textarea {
+    resize: vertical;
+  }
+}
+
+.form-field.full {
+  grid-column: 1 / -1;
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 22px;
+}
+
+/* ============================================================
+   TABLE
+   ============================================================ */
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 900px;
+  color: #111827;
+
+  th {
+    text-align: left;
+    background: #f3f4f6;
+    color: #374151;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 12px;
+    border-bottom: 1px solid #d1d5db;
+    white-space: nowrap;
+  }
+
+  td {
+    padding: 13px 12px;
+    border-bottom: 1px solid #e5e7eb;
+    font-size: 13px;
+    vertical-align: middle;
+    color: #374151;
+    background: #ffffff;
+  }
+
+  tbody tr:hover {
+    background: #f9fafb;
+
+    td {
+      background: #f9fafb;
+    }
+  }
+
+  strong {
+    display: block;
+    color: #111827;
+    font-weight: 700;
+  }
+
+  small {
+    display: block;
+    color: #6b7280;
+    margin-top: 3px;
+  }
+}
+
+/* ============================================================
+   TABLE CONTROLS
+   ============================================================ */
+
+.table-select {
+  border: 1px solid #cbd5e1;
+  border-radius: 6px;
+  padding: 7px 9px;
+  background: #ffffff;
+  color: #111827;
+  font-size: 12px;
+  cursor: pointer;
+
+  &:focus {
+    outline: none;
+    border-color: #2563eb;
+  }
+}
+
+/* ============================================================
+   STATUS BADGES
+   ============================================================ */
+
+.status-badge,
+.expiry-badge {
+  display: inline-block;
+  padding: 5px 9px;
+  border-radius: 999px;
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.status-badge {
+  background: #eff6ff;
+  color: #1d4ed8;
+}
+
+.expiry-badge {
+  background: #fef3c7;
+  color: #92400e;
+}
+
+/* ============================================================
+   EMPTY STATE
+   ============================================================ */
+
+.empty-state {
+  padding: 30px;
+  text-align: center;
+  color: #6b7280;
+  background: #f9fafb;
+  border: 1px dashed #d1d5db;
+  border-radius: 8px;
+}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+
+@media (max-width: 1200px) {
+  .summary-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .contracts-page {
+    padding: 18px;
+  }
+
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .summary-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .form-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-field.full {
+    grid-column: auto;
+  }
+}
+
+@media (max-width: 480px) {
+  .summary-grid {
+    grid-template-columns: 1fr;
+  }
+}

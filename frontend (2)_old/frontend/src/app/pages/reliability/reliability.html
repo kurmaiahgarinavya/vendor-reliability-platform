@@ -1,0 +1,565 @@
+<div class="page">
+
+  <div class="page-header">
+
+    <div>
+
+      <span class="eyebrow">
+        VENDOR RELIABILITY
+      </span>
+
+      <h1>
+        Reliability Intelligence
+      </h1>
+
+      <p>
+        Evaluate supplier reliability, procurement risk and
+        performance trends using actual platform data.
+      </p>
+
+    </div>
+
+    <button
+      type="button"
+      class="refresh-button"
+      (click)="refresh()"
+    >
+      ↻ Refresh
+    </button>
+
+  </div>
+
+
+  @if (loading) {
+
+    <div class="loading-panel">
+
+      <div class="spinner"></div>
+
+      <p>
+        Loading vendor reliability data...
+      </p>
+
+    </div>
+
+  }
+
+
+  @if (!loading && errorMessage) {
+
+    <div class="error-banner">
+
+      <strong>
+        Unable to load reliability data
+      </strong>
+
+      <span>
+        {{ errorMessage }}
+      </span>
+
+    </div>
+
+  }
+
+
+  @if (
+    !loading &&
+    !errorMessage &&
+    vendors.length === 0
+  ) {
+
+    <div class="empty-panel">
+
+      <div class="empty-icon">
+        📊
+      </div>
+
+      <h2>
+        No vendor reliability data available
+      </h2>
+
+      <p>
+        Reliability information will appear when vendor
+        procurement and performance data are available.
+      </p>
+
+    </div>
+
+  }
+
+
+  @if (
+    !loading &&
+    vendors.length > 0
+  ) {
+
+    <!-- Vendor Selection -->
+
+    <section class="panel vendor-selector">
+
+      <div class="section-header">
+
+        <div>
+
+          <h2>
+            Supplier Reliability
+          </h2>
+
+          <p>
+            Select a vendor to inspect its reliability factors.
+          </p>
+
+        </div>
+
+        <span class="vendor-count">
+          {{ vendors.length }} Vendors
+        </span>
+
+      </div>
+
+
+      <div class="vendor-list">
+
+        @for (
+          vendor of vendors;
+          track vendor.vendor_id
+        ) {
+
+          <button
+            type="button"
+            class="vendor-option"
+            [class.active]="
+              selectedVendor?.vendor_id === vendor.vendor_id
+            "
+            (click)="selectVendor(vendor)"
+          >
+
+            <div class="vendor-info">
+
+              <strong>
+                {{ vendor.vendor_name }}
+              </strong>
+
+              <span>
+                {{ vendor.category }}
+              </span>
+
+            </div>
+
+            <div
+              class="mini-score"
+              [class]="
+                getScoreClass(vendor.reliability_score)
+              "
+            >
+              {{ formatScore(vendor.reliability_score) }}
+            </div>
+
+          </button>
+
+        }
+
+      </div>
+
+    </section>
+
+
+    @if (selectedVendor) {
+
+      <!-- Score Cards -->
+
+      <section class="score-section">
+
+        <div class="score-card">
+
+          <span>
+            Overall Reliability Score
+          </span>
+
+          <strong>
+            {{ formatScore(selectedVendor.reliability_score) }}
+          </strong>
+
+          <p>
+            Calculated from the required reliability factors.
+          </p>
+
+        </div>
+
+
+        <div class="score-card">
+
+          <span>
+            Supplier Ranking
+          </span>
+
+          <strong>
+            #{{ selectedVendor.supplier_ranking }}
+          </strong>
+
+          <p>
+            Ranking across available vendors.
+          </p>
+
+        </div>
+
+
+        <div class="score-card">
+
+          <span>
+            Procurement Risk Level
+          </span>
+
+          <strong
+            class="risk-value"
+            [class]="
+              getRiskClass(
+                selectedVendor.procurement_risk_level
+              )
+            "
+          >
+            {{ selectedVendor.procurement_risk_level }}
+          </strong>
+
+          <p>
+            Risk classification from platform data.
+          </p>
+
+        </div>
+
+      </section>
+
+
+      <!-- Vendor Information -->
+
+      <section class="panel vendor-summary">
+
+        <div>
+
+          <span class="eyebrow">
+            SELECTED SUPPLIER
+          </span>
+
+          <h2>
+            {{ selectedVendor.vendor_name }}
+          </h2>
+
+          <p>
+            {{ selectedVendor.category }}
+            ·
+            {{ selectedVendor.vendor_status }}
+          </p>
+
+        </div>
+
+        <div class="summary-score">
+
+          <span>
+            Reliability
+          </span>
+
+          <strong>
+            {{ formatScore(selectedVendor.reliability_score) }}
+          </strong>
+
+        </div>
+
+      </section>
+
+
+      <!-- Reliability Factors -->
+
+      <section class="content-grid">
+
+        <div class="panel">
+
+          <div class="panel-header">
+
+            <div>
+
+              <h2>
+                Reliability Factors
+              </h2>
+
+              <p>
+                Six required supplier reliability factors.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          @for (
+            factor of selectedVendor.factors;
+            track factor.name
+          ) {
+
+            <div class="factor-row">
+
+              <div class="factor-information">
+
+                <strong>
+                  {{ factor.name }}
+                </strong>
+
+                <span>
+                  {{ factor.description }}
+                </span>
+
+              </div>
+
+              <div class="factor-value">
+
+                @if (factor.score !== null) {
+
+                  <strong>
+                    {{ formatScore(factor.score) }}
+                  </strong>
+
+                  <span
+                    [class]="
+                      getScoreClass(factor.score)
+                    "
+                  >
+                    {{ factor.status }}
+                  </span>
+
+                } @else {
+
+                  <strong>
+                    —
+                  </strong>
+
+                  <span class="no-data">
+                    No Data
+                  </span>
+
+                }
+
+              </div>
+
+            </div>
+
+          }
+
+        </div>
+
+
+        <!-- Risk Classification -->
+
+        <div class="panel">
+
+          <div class="panel-header">
+
+            <div>
+
+              <h2>
+                Risk Classification
+              </h2>
+
+              <p>
+                Current procurement risk classification.
+              </p>
+
+            </div>
+
+          </div>
+
+
+          <div
+            class="risk-main"
+            [class]="
+              getRiskClass(
+                selectedVendor.procurement_risk_level
+              )
+            "
+          >
+
+            <span>
+              Current Risk
+            </span>
+
+            <strong>
+              {{ selectedVendor.procurement_risk_level }}
+            </strong>
+
+          </div>
+
+
+          <div class="risk-scale">
+
+            <div class="risk-item low-risk">
+
+              <span>Low Risk</span>
+
+              <small>
+                75–100
+              </small>
+
+            </div>
+
+            <div class="risk-item medium-risk">
+
+              <span>Medium Risk</span>
+
+              <small>
+                50–74
+              </small>
+
+            </div>
+
+            <div class="risk-item high-risk">
+
+              <span>High Risk</span>
+
+              <small>
+                Below 50
+              </small>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </section>
+
+
+      <!-- Trend -->
+
+      <section class="panel trend-panel">
+
+        <div class="panel-header">
+
+          <div>
+
+            <h2>
+              Performance Trend Analysis
+            </h2>
+
+            <p>
+              Historical performance evaluation trend.
+            </p>
+
+          </div>
+
+          <span class="trend-count">
+            {{ selectedVendor.trend.length }}
+            Evaluations
+          </span>
+
+        </div>
+
+
+        @if (
+          selectedVendor.trend.length === 0
+        ) {
+
+          <div class="trend-empty">
+
+            <strong>
+              No historical trend available
+            </strong>
+
+            <p>
+              Trend analysis will appear after vendor
+              performance evaluations are recorded.
+            </p>
+
+          </div>
+
+        } @else {
+
+          <div class="trend-list">
+
+            @for (
+              item of selectedVendor.trend;
+              track item.evaluation_date
+            ) {
+
+              <div class="trend-row">
+
+                <span>
+                  {{ item.evaluation_date | date:'dd MMM yyyy' }}
+                </span>
+
+                <div class="trend-bar">
+
+                  <div
+                    class="trend-fill"
+                    [style.width.%]="
+                      getTrendWidth(
+                        item.performance_score
+                      )
+                    "
+                  ></div>
+
+                </div>
+
+                <strong>
+                  {{ formatScore(item.performance_score) }}
+                </strong>
+
+              </div>
+
+            }
+
+          </div>
+
+        }
+
+      </section>
+
+
+      <!-- Recommendations -->
+
+      <section class="panel recommendations-panel">
+
+        <div class="panel-header">
+
+          <div>
+
+            <h2>
+              Procurement Recommendations
+            </h2>
+
+            <p>
+              Recommendations based on current reliability data.
+            </p>
+
+          </div>
+
+        </div>
+
+
+        <div class="recommendation-list">
+
+          @for (
+            recommendation of selectedVendor.recommendations;
+            track recommendation
+          ) {
+
+            <div class="recommendation">
+
+              <span class="recommendation-icon">
+                ✓
+              </span>
+
+              <p>
+                {{ recommendation }}
+              </p>
+
+            </div>
+
+          }
+
+        </div>
+
+      </section>
+
+    }
+
+  }
+
+</div>
