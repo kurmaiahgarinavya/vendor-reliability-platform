@@ -68,7 +68,7 @@ export interface RiskAnalysisResponse {
 })
 export class ReliabilityService {
   private readonly apiUrl =
-    'http://127.0.0.1:8000/api/vendor-reliability';
+    'https://vendor-reliability-platform.onrender.com/api/vendor-reliability';
 
   constructor(private http: HttpClient) {}
 

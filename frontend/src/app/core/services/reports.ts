@@ -77,7 +77,7 @@ export interface ContractReport {
 export class ReportsService {
 
   private readonly apiUrl =
-    'http://127.0.0.1:8000/api/reports';
+    'https://vendor-reliability-platform.onrender.com/api/reports';
 
   constructor(private http: HttpClient) {}
 

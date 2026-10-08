@@ -92,7 +92,7 @@ export interface DashboardAnalytics {
 export class AnalyticsService {
 
   private readonly apiUrl =
-    'http://127.0.0.1:8000/api/analytics/dashboard';
+    'https://vendor-reliability-platform.onrender.com/api/analytics/dashboard';
 
   constructor(
     private http: HttpClient

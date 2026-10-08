@@ -20,7 +20,7 @@ interface User {
 })
 export class Users implements OnInit {
 
-  private readonly apiUrl = 'http://127.0.0.1:8000/api/users';
+  private readonly apiUrl = 'https://vendor-reliability-platform.onrender.com/api/users';
 
   users: User[] = [];
   loading = true;

@@ -35,7 +35,7 @@ export interface CommunicationStatusUpdate {
 export class CommunicationService {
 
   private readonly apiUrl =
-    'http://127.0.0.1:8000/api/communications';
+    'https://vendor-reliability-platform.onrender.com/api/communications';
 
   constructor(private http: HttpClient) {}
 

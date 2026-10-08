@@ -42,7 +42,7 @@ export interface ResetPasswordRequest {
 export class AuthService {
 
   private readonly apiUrl =
-    'http://127.0.0.1:8000/api';
+    'https://vendor-reliability-platform.onrender.com/api';
 
   currentUser = signal<User | null>(null);
 

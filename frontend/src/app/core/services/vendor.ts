@@ -55,7 +55,7 @@ export interface VendorUpdate {
   providedIn: 'root'
 })
 export class VendorService {
-  private readonly apiUrl = 'http://127.0.0.1:8000/api/vendors';
+  private readonly apiUrl = 'https://vendor-reliability-platform.onrender.com/api/vendors';
 
   constructor(private http: HttpClient) {}
 

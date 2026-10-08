@@ -106,7 +106,7 @@ export interface Invoice {
 export class PurchaseOrderService {
 
   private readonly apiUrl =
-    'http://127.0.0.1:8000/api/purchase-orders';
+    'https://vendor-reliability-platform.onrender.com/api/purchase-orders';
 
   constructor(
     private http: HttpClient

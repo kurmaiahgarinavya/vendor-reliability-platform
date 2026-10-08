@@ -59,7 +59,7 @@ export interface DatasetAnalytics {
 export class DatasetAnalyticsService {
 
   private readonly apiUrl =
-    'http://127.0.0.1:8000/api/dataset-analytics';
+    'https://vendor-reliability-platform.onrender.com/api/dataset-analytics';
 
   constructor(
     private http: HttpClient

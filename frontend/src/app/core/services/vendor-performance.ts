@@ -74,7 +74,7 @@ export interface VendorPerformanceCreate {
 export class VendorPerformanceService {
 
   private readonly apiUrl =
-    'http://127.0.0.1:8000/api/vendor-performance';
+    'https://vendor-reliability-platform.onrender.com/api/vendor-performance';
 
   constructor(private http: HttpClient) {}
 

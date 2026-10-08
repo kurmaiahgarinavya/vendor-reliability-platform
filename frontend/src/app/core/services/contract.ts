@@ -167,7 +167,7 @@ export interface VendorDocumentCreate {
 export class ContractService {
 
   private readonly apiUrl =
-    'http://127.0.0.1:8000/api/contracts';
+    'https://vendor-reliability-platform.onrender.com/api/contracts';
 
   constructor(
     private http: HttpClient

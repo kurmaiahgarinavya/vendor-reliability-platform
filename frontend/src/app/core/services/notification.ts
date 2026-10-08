@@ -59,10 +59,10 @@ export interface RiskAlertResponse {
 export class NotificationService {
 
   private readonly apiUrl =
-    'http://127.0.0.1:8000/api/notifications';
+    'https://vendor-reliability-platform.onrender.com/api/notifications';
 
   private readonly riskAlertsUrl =
-    'http://127.0.0.1:8000/api/risk-alerts';
+    'https://vendor-reliability-platform.onrender.com/api/risk-alerts';
 
   constructor(private http: HttpClient) {}
 

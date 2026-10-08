@@ -6,7 +6,7 @@ import { HttpClient } from '@angular/common/http';
 })
 export class ApiService {
 
-  private readonly apiUrl = 'http://127.0.0.1:8000/api';
+  private readonly apiUrl = 'https://vendor-reliability-platform.onrender.com/api';
 
   constructor(private http: HttpClient) {}
 
@@ -22,4 +22,4 @@ export class ApiService {
       data
     );
   }
-}
+} 
